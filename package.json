@@ -2,9 +2,10 @@
   "name": "vue3-bms",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --mode dev",
+    "serve": "vite preview",
     "build": "vite build",
-    "serve": "vite preview"
+    "lint": "vue-cli-service lint",
+    "dev": "vite --mode dev"
   },
   "dependencies": {
     "axios": "^0.23.0",
@@ -15,6 +16,14 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.9.3",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/eslint-config-standard": "^5.1.2",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "eslint-plugin-vue": "^7.0.0",
     "sass": "^1.43.3",
     "vite": "^2.6.4"
   }
