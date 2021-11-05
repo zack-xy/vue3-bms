@@ -5,11 +5,14 @@
     "serve": "vite preview",
     "build": "vite build",
     "lint": "vue-cli-service lint",
-    "dev": "vite --mode dev"
+    "dev": "vite --mode dev",
+    "lint:style": "stylelint \"src/assets/style/*.{css,scss}\"",
+    "fix:style": "stylelint --fix \"src/assets/style/*.{css,scss}\""
   },
   "dependencies": {
+    "@element-plus/icons": "^0.0.11",
     "axios": "^0.23.0",
-    "element-plus": "^1.1.0-beta.24",
+    "element-plus": "^1.2.0-beta.1",
     "vue": "^3.2.16",
     "vue-router": "4",
     "vuex": "^4.0.2"
@@ -25,6 +28,8 @@
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^7.0.0",
     "sass": "^1.43.3",
+    "stylelint": "^14.0.1",
+    "stylelint-config-standard": "^23.0.0",
     "vite": "^2.6.4"
   }
 }

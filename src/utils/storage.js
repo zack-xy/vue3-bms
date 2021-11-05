@@ -1,7 +1,7 @@
-import config from '@/config';
+import config from '@/config'
 export default {
   getStorage () {
-    const storage = window.localStorage.getItem(config.namespace) || "{}"
+    const storage = window.localStorage.getItem(config.namespace) || '{}'
     return JSON.parse(storage)
   },
   setItem (key, val) {

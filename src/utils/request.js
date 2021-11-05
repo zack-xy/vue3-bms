@@ -1,9 +1,9 @@
 import axios from 'axios'
 import config from '../config'
-import router from '../router';
+import router from '../router'
 import { ElMessage } from 'element-plus'
-const TOKEN_INVALID = "Token认证失败，请重新登陆"
-const NETWORK_ERROR = "网络请求异常，请稍后重试"
+const TOKEN_INVALID = 'Token认证失败，请重新登陆'
+const NETWORK_ERROR = '网络请求异常，请稍后重试'
 const REQUEST_TYPES = ['get', 'post', 'put', 'delete', 'patch']
 const service = axios.create({
   baseURL: config.baseApi,
@@ -13,7 +13,7 @@ const service = axios.create({
 service.interceptors.request.use(req => {
   const headers = req.headers
   if (!headers.Authorization) {
-    headers.Authorization = "Zack"
+    headers.Authorization = 'Zack'
   }
   return req
 })
@@ -25,7 +25,7 @@ service.interceptors.response.use(res => {
   } else if (code === 401) {
     ElMessage.error(TOKEN_INVALID)
     setTimeout(() => {
-      router.push("/login")
+      router.push('/login')
     }, 15000)
     return Promise.reject(TOKEN_INVALID)
   } else {
@@ -36,7 +36,7 @@ service.interceptors.response.use(res => {
 function request (options) {
   options.method = options.method || 'post'
   if (options.method.toLowerCase() === 'get') {
-    options.params = options.el - icon - data - board
+    options.params = options.data
   }
   if (config.env === 'prod') {
     service.defaults.baseURL = config.baseApi
