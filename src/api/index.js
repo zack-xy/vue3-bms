@@ -7,24 +7,21 @@ export default {
   login (params) {
     return request({
       url: '/users/login',
-      data: params,
-      mock: true
+      data: params
     })
   },
   // 获取消息数目
   noticeCount (params) {
     return request({
       url: '/approve/count',
-      data: params,
-      mock: true
+      data: params
     })
   },
   // 获取菜单列表
   getMenuList (params) {
     return request({
       url: '/menu/list',
-      data: params,
-      mock: true
+      data: params
     })
   }
 }

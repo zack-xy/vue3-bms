@@ -5,7 +5,7 @@ const env = import.meta.env.MODE || 'prod'
 const EnvConfig = {
   // 开发环境
   dev: {
-    baseApi: 'http://localhost:8081/', // 本地联调
+    baseApi: '/vue3Bms', // 本地联调
     mockApi: 'http://localhost:3060/vue3Bms/'
   },
   // sit测试环境
@@ -26,7 +26,8 @@ const EnvConfig = {
 }
 export default {
   env,
-  mock: env === 'dev',
+  // mock: env === 'dev',
+  mock: false, // 联调
   namespace: 'vue3Bms',
   ...EnvConfig[env]
 }

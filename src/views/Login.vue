@@ -72,7 +72,7 @@ export default {
             })
             .catch(err => {
               ElMessage({
-                message: err.msg || '登陆失败，请重试',
+                message: err,
                 type: 'error'
               })
               globalLoading.close()

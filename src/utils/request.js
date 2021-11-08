@@ -22,7 +22,7 @@ service.interceptors.response.use(res => {
   const { code, msg } = res.data
   if (code === 200) {
     return res.data
-  } else if (code === 401) {
+  } else if (code === 5001) {
     ElMessage.error(TOKEN_INVALID)
     setTimeout(() => {
       router.push('/login')
