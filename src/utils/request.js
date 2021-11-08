@@ -19,10 +19,10 @@ service.interceptors.request.use(req => {
 })
 // 响应拦截
 service.interceptors.response.use(res => {
-  const { code, data, msg } = res.data
+  const { code, msg } = res.data
   if (code === 200) {
-    return data
-  } else if (code === 4001) {
+    return res.data
+  } else if (code === 401) {
     ElMessage.error(TOKEN_INVALID)
     setTimeout(() => {
       router.push('/login')
@@ -37,6 +37,9 @@ function request (options) {
   options.method = options.method || 'post'
   if (options.method.toLowerCase() === 'get') {
     options.params = options.data
+  }
+  if (typeof options.mock !== 'undefined') {
+    config.mock = options.mock
   }
   if (config.env === 'prod') {
     service.defaults.baseURL = config.baseApi

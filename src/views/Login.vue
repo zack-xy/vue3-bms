@@ -1,13 +1,12 @@
-/* eslint-disable vue/no-unused-components */
 <template>
     <div class="login-wrapper">
         <div class="modal">
-            <el-form :model="user" status-icon :rules="rules">
+            <el-form ref="userForm" :model="user" status-icon :rules="rules">
                 <div class="title">登陆</div>
-                <el-form-item>
+                <el-form-item prop="userName">
                     <el-input type="text" placeholder="用户名" clearable :prefix-icon="User" v-model="user.userName"></el-input>
                 </el-form-item>
-                <el-form-item>
+                <el-form-item prop="userPwd">
                     <el-input type="password" placeholder="密码" clearable :prefix-icon="View" v-model="user.userPwd"></el-input>
                 </el-form-item>
                 <el-form-item>
@@ -18,7 +17,9 @@
     </div>
 </template>
 <script>
+import { ElMessage } from 'element-plus'
 import { User, View } from '@element-plus/icons'
+import { globalLoading } from '@/utils/tools.js'
 export default {
   components: {
     // eslint-disable-next-line vue/no-unused-components
@@ -35,12 +36,16 @@ export default {
       rules: {
         userName: [
           {
-            required: true, message: '请输入用户名', trigger: 'blur'
+            required: true,
+            message: '请输入用户名',
+            trigger: 'blur'
           }
         ],
         userPwd: [
           {
-            required: true, message: '请输入密码', trigger: 'blur'
+            required: true,
+            message: '请输入密码',
+            trigger: 'blur'
           }
         ]
       }
@@ -48,7 +53,34 @@ export default {
   },
   methods: {
     handleLogin () {
-
+      this.$refs.userForm.validate(validate => {
+        if (validate) {
+          globalLoading.show()
+          this.$api
+            .login(this.user)
+            .then(res => {
+              globalLoading.close()
+              if (res.code === 200) {
+                this.$store.commit('saveUserInfo', res.data)
+                this.$router.push('/welcome')
+              } else {
+                ElMessage({
+                  message: res.msg || '登陆失败，请重试',
+                  type: 'warning'
+                })
+              }
+            })
+            .catch(err => {
+              ElMessage({
+                message: err.msg || '登陆失败，请重试',
+                type: 'error'
+              })
+              globalLoading.close()
+            })
+        } else {
+          return false
+        }
+      })
     }
   },
   setup () {
