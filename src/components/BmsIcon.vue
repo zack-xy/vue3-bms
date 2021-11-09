@@ -6,6 +6,8 @@
 <script>
 // import { defineAsyncComponent } from 'vue'
 import { Location, Promotion, Setting, Fold, Expand, Bell, UserFilled } from '@element-plus/icons'
+import ExtAnalitycs from '@/assets/icons/analitycs.svg'
+// （使用了vite-svg-loader插件）导入svg文件作为vue组件，命名以Ext开头，表示扩展
 export default {
   inheritAttrs: false,
   components: {
@@ -15,10 +17,8 @@ export default {
     Fold,
     Expand,
     Bell,
-    UserFilled
-    // 'my-icon': defineAsyncComponent(() =>
-    //     import("./components/AsyncComponent.vue")
-    // )
+    UserFilled,
+    ExtAnalitycs
   },
   props: {
     name: {
@@ -30,7 +30,8 @@ export default {
     return {}
   },
   setup () {
-    return {}
+    return {
+    }
   }
 }
 </script>
