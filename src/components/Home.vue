@@ -8,28 +8,28 @@
             </div>
             <!-- 导航菜单 -->
             <el-menu :default-active="activeMenu" background-color="#001529" text-color="#fff" router :collapse="isCollapse" class="nav-menu">
-                <tree-menu :userMenu="userMenu" />
+                <tree-menu :userMenu="userMenu" :collapse="isCollapse"/>
             </el-menu>
         </div>
         <div :class="['content-right', isCollapse ? 'fold' : 'unfold']">
             <div class="nav-top">
                 <div class="nav-left">
                     <div class="menu-fold">
-                        <Fold class="icon" @click="toggle" v-show="!isCollapse"></Fold>
-                        <Expand class="icon" @click="toggle" v-show="isCollapse"></Expand>
+                        <BmsIcon class="icon" name="fold" @click="toggle" v-show="!isCollapse"/>
+                        <BmsIcon class="icon" name="expand" @click="toggle" v-show="isCollapse"/>
                     </div>
                     <div class="bread">
-                        面包屑
+                        <BreadCrumb></BreadCrumb>
                     </div>
                 </div>
                 <div class="user-info">
                     <el-badge :value="noticeCount>0 ? noticeCount: undefined" :max="99" class="notice" type="danger">
-                        <Bell class="bell-icon"></Bell>
+                        <BmsIcon class="bell-icon" name="bell" />
                     </el-badge>
                     <el-dropdown @command="handleLogout">
                         <span class="user-link">
                             {{ userInfo.userName }}
-                            <UserFilled class="user-icon"></UserFilled>
+                            <BmsIcon class="user-icon" name="user-filled" />
                         </span>
                         <template #dropdown>
                             <el-dropdown-menu>
@@ -49,33 +49,41 @@
     </div>
 </template>
 <script>
-import { Fold, Expand, Bell, UserFilled } from '@element-plus/icons'
+import BmsIcon from './BmsIcon.vue'
 import { globalLoading } from '@/utils/tools.js'
+import TreeMenu from './TreeMenu.vue'
+import BreadCrumb from './BreadCrumb.vue'
 export default {
   data () {
     return {
       isCollapse: false,
-      userInfo: this.$store.state.userInfo,
+      userInfo: this.$store.state.userInfo || {},
       noticeCount: 0,
       userMenu: [],
       activeMenu: location.hash.slice(1)
     }
   },
   components: {
-    Fold,
-    Expand,
-    Bell,
-    UserFilled
+    TreeMenu,
+    BreadCrumb,
+    BmsIcon
   },
   methods: {
     toggle () {
       this.isCollapse = !this.isCollapse
     },
-    handleLogout () {},
+    handleLogout (key) {
+      if (key === 'email') return
+      this.$store.commit('saveUserInfo', '')
+      this.userInfo = null
+      this.$router.push('/login')
+    },
     async getNoticeCount () {
       try {
         globalLoading.show()
-        const { data } = await this.$api.noticeCount()
+        const { data } = await this.$api.noticeCount({
+          userId: this.userInfo.userId
+        })
         this.noticeCount = data
         globalLoading.close()
       } catch (error) {
@@ -85,8 +93,8 @@ export default {
     async getMenuList () {
       try {
         globalLoading.show()
-        const list = await this.$api.getMenuList()
-        this.userMenu = list
+        const { data } = await this.$api.getMenuList()
+        this.userMenu = data
         globalLoading.close()
       } catch (error) {
         console.error(error)
@@ -116,10 +124,12 @@ export default {
         // 合并
         &.fold {
             width: 64px;
+            transition: width 0.35s ease-in;
         }
         // 展开
         &.unfold {
             width: 200px;
+            transition: width 0.25s ease-out;
         }
         .logo {
             display: flex;
@@ -159,9 +169,7 @@ export default {
                 align-items: center;
                 .menu-fold {
                     .icon {
-                        font-size: 10px;
-                        width: 30px;
-                        height: 30px;
+                        font-size: 30px;
                         margin-right: 5px;
                         vertical-align: middle;
                         margin-bottom: 4px;
@@ -171,11 +179,10 @@ export default {
             }
             .user-info {
                 .notice {
-                    line-height: 30px;
+                    line-height: 15px;
                     margin-right: 15px;
                     .bell-icon {
-                        width: 20px;
-                        height: 20px;
+                        font-size: 20px;
                         cursor: pointer;
                     }
                 }
@@ -183,9 +190,9 @@ export default {
                     cursor: pointer;
                     color: #409eff;
                     .user-icon {
-                        width: 20px;
-                        height: 20px;
-                        margin-bottom: -3px;
+                        font-size: 20px;
+                        vertical-align: middle;
+                        margin-bottom: 3px;
                         cursor: pointer;
                     }
                 }
