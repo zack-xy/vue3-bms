@@ -118,7 +118,7 @@ export default {
         width: 200px;
         height: 100vh;
         background-color: #001529;
-        color: #fff;
+        color: $white;
         overflow-y: auto;
         transition: width 0.5s;
         // 合并
@@ -203,7 +203,7 @@ export default {
             padding: 20px;
             height: calc(100vh - 50px);
             .main-page {
-                background-color: #fff;
+                background-color: $white;
                 height: 100%;
             }
         }

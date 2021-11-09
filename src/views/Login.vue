@@ -102,7 +102,7 @@ export default {
     .modal {
         width: 500px;
         padding: 50px;
-        background-color: #fff;
+        background-color: $white;
         border-radius: 4px;
         box-shadow: 0px 0px 10px 3px #c7c9cb4d;
         .title {
