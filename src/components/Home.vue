@@ -50,7 +50,7 @@
 </template>
 <script>
 import BmsIcon from './BmsIcon.vue'
-import { globalLoading, alertMessage } from '@/utils/tools.js'
+import { globalLoading } from '@/utils/tools.js'
 import TreeMenu from './TreeMenu.vue'
 import BreadCrumb from './BreadCrumb.vue'
 export default {
@@ -88,7 +88,6 @@ export default {
         globalLoading.close()
       } catch (error) {
         globalLoading.close()
-        alertMessage.error(error || '请求失败')
       }
     },
     async getMenuList () {
@@ -99,7 +98,6 @@ export default {
         globalLoading.close()
       } catch (error) {
         globalLoading.close()
-        alertMessage.error(error || '请求失败')
       }
     }
   },

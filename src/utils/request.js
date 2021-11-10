@@ -15,7 +15,7 @@ service.interceptors.request.use(req => {
   const headers = req.headers
   const { token } = storage.getItem('userInfo')
   if (!headers.Authorization) {
-    headers.Authorization = token
+    headers.Authorization = 'Bearer ' + token
   }
   return req
 })
@@ -25,13 +25,21 @@ service.interceptors.response.use(res => {
   if (code === 200) {
     return res.data
   } else if (code === 5001) {
-    ElMessage.error(TOKEN_INVALID)
+    ElMessage.error({
+      message: TOKEN_INVALID,
+      type: 'error',
+      showClose: true
+    })
     setTimeout(() => {
       router.push('/login')
     }, 15000)
     return Promise.reject(TOKEN_INVALID)
   } else {
-    ElMessage.error(msg || NETWORK_ERROR)
+    ElMessage.error({
+      message: msg || NETWORK_ERROR,
+      type: 'error',
+      showClose: true
+    })
     return Promise.reject(msg || NETWORK_ERROR)
   }
 })
