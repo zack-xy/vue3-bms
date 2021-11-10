@@ -1,5 +1,8 @@
-import { ElLoading } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus'
+const MSG_TYPE = ['info', 'success', 'warning', 'error']
 // 全屏Loading
+// globalLoading.show()
+// globalLoading.close()s
 const globalLoading = {
   loading: null,
   loadingNum: 0,
@@ -18,6 +21,22 @@ const globalLoading = {
     }
   }
 }
+
+// 弹窗提示
+// alertMessage.info(msg)
+const alertMessage = {}
+MSG_TYPE.forEach(type => {
+  alertMessage[type] = (msg = '') => {
+    ElMessage({
+      message: msg,
+      type,
+      showClose: true
+    })
+  }
+})
+
+// 弹窗提示
 export {
-  globalLoading
+  globalLoading,
+  alertMessage
 }
