@@ -21,6 +21,24 @@ const routes = [
     ]
   },
   {
+    name: 'system',
+    path: '/system',
+    meta: {
+      title: '系统管理'
+    },
+    component: Home,
+    children: [
+      {
+        name: 'user',
+        path: 'user',
+        meta: {
+          title: '用户管理'
+        },
+        component: () => import('../views/User.vue')
+      }
+    ]
+  },
+  {
     name: 'login',
     path: '/login',
     meta: {
