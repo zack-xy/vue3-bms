@@ -2,13 +2,13 @@
   <div class="user-manage">
     <div class="query-form">
       <el-form :inline="true" :model="user">
-        <el-form-item>
+        <el-form-item prop="userId">
           <el-input v-model="user.userId" placeholder="请输入用户ID" clearable></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="userName">
           <el-input v-model="user.userName" placeholder="请输入用户名称" clearable></el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="state">
          <el-select v-model="user.state" placeholder="请选择" clearable>
            <el-option :value="0" label="所有"></el-option>
            <el-option :value="1" label="在职"></el-option>
@@ -17,8 +17,8 @@
          </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">查询</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" @click="handleQuery">查询</el-button>
+          <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -49,19 +49,17 @@
 
 <script>
 import { onMounted, reactive, ref } from 'vue'
+import $api from '@/api'
+import { alertMessage } from '@/utils/tools.js'
 export default {
   name: 'user',
   setup () {
-    const user = reactive({})
-    const userList = ref([{
-      userId: '001011021',
-      userEmail: '321312@qq.com',
-      userName: '战三',
-      role: 0,
-      state: 1,
-      createTime: '2021-10-01 12:23:12',
-      lastLoginTime: '2021-10-01 12:23:12'
-    }])
+    const user = reactive({ userId: '', userName: '', state: 0 })
+    const userList = ref([])
+    const pager = reactive({
+      pageNum: 1,
+      pageSize: 10
+    })
     const columns = reactive([
       {
         label: '用户ID',
@@ -96,12 +94,31 @@ export default {
       }
     ])
     onMounted(() => {
-      console.log('init.....')
+      getUserList()
     })
+    const getUserList = async () => {
+      const params = { ...user, ...pager }
+      try {
+        const { data } = await $api.getUserList(params)
+        const { list, page } = data
+        pager.total = page.total
+        userList.value = list
+      } catch (error) {
+        alertMessage.error(error)
+      }
+    }
+    const handleQuery = () => {
+      getUserList()
+    }
+    const handleReset = () => {}
     return {
       user,
       userList,
-      columns
+      columns,
+      pager,
+      getUserList,
+      handleQuery,
+      handleReset
     }
   }
 }

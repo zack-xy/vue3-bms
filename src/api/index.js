@@ -10,6 +10,7 @@ export default {
       data: params
     })
   },
+
   // 获取消息数目
   noticeCount (params) {
     return request({
@@ -17,10 +18,19 @@ export default {
       data: params
     })
   },
+
   // 获取菜单列表
   getMenuList (params) {
     return request({
       url: '/menu/list',
+      data: params
+    })
+  },
+
+  // 获取用户列表
+  getUserList (params) {
+    return request({
+      url: '/users/list',
       data: params
     })
   }

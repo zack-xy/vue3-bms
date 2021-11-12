@@ -27,6 +27,7 @@ const globalLoading = {
 const alertMessage = {}
 MSG_TYPE.forEach(type => {
   alertMessage[type] = (msg = '') => {
+    ElMessage.closeAll()
     ElMessage({
       message: msg,
       type,
