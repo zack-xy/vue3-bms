@@ -33,5 +33,13 @@ export default {
       url: '/users/list',
       data: params
     })
+  },
+
+  // 用户删除
+  userDelete (params) {
+    return request({
+      url: '/users/delete',
+      data: params
+    })
   }
 }
