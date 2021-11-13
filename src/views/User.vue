@@ -1,14 +1,14 @@
 <template>
   <div class="user-manage">
     <div class="query-form">
-      <el-form :inline="true" :model="user">
-        <el-form-item prop="userId">
+      <el-form :inline="true" :model="user" ref="form">
+        <el-form-item prop="userId" label="用户ID">
           <el-input v-model="user.userId" placeholder="请输入用户ID" clearable></el-input>
         </el-form-item>
-        <el-form-item prop="userName">
+        <el-form-item prop="userName" label="用户名称">
           <el-input v-model="user.userName" placeholder="请输入用户名称" clearable></el-input>
         </el-form-item>
-        <el-form-item prop="state">
+        <el-form-item prop="state" label="状态">
          <el-select v-model="user.state" placeholder="请选择" clearable>
            <el-option :value="0" label="所有"></el-option>
            <el-option :value="1" label="在职"></el-option>
@@ -18,7 +18,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="handleReset">重置</el-button>
+          <el-button @click="handleReset(this.$refs)">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -43,6 +43,18 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        class="pagination"
+        background
+        :pager-count="6"
+        :page-sizes="[10, 30, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :current-page="pager.pageNum"
+        :page-size="pager.pageSize"
+        :total="pager.total"
+        @size-change="handleSizeChanged"
+        @current-change="handlePageChanged"
+      ></el-pagination>
     </div>
   </div>
 </template>
@@ -54,9 +66,13 @@ import { alertMessage } from '@/utils/tools.js'
 export default {
   name: 'user',
   setup () {
+    onMounted(() => {
+      getUserList()
+    })
     const user = reactive({ userId: '', userName: '', state: 0 })
     const userList = ref([])
     const pager = reactive({
+      total: 0,
       pageNum: 1,
       pageSize: 10
     })
@@ -93,9 +109,6 @@ export default {
         minWidth: 150
       }
     ])
-    onMounted(() => {
-      getUserList()
-    })
     const getUserList = async () => {
       const params = { ...user, ...pager }
       try {
@@ -110,7 +123,18 @@ export default {
     const handleQuery = () => {
       getUserList()
     }
-    const handleReset = () => {}
+    const handleReset = ($refs) => {
+      $refs && $refs.form && $refs.form.resetFields()
+    }
+    const handleSizeChanged = (size) => {
+      pager.pageNum = 1
+      pager.pageSize = size
+      getUserList()
+    }
+    const handlePageChanged = (page) => {
+      pager.pageNum = page
+      getUserList()
+    }
     return {
       user,
       userList,
@@ -118,7 +142,9 @@ export default {
       pager,
       getUserList,
       handleQuery,
-      handleReset
+      handleReset,
+      handleSizeChanged,
+      handlePageChanged
     }
   }
 }

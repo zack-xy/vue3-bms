@@ -200,6 +200,7 @@ export default {
             background: #eef0f3;
             padding: 20px;
             height: calc(100vh - 50px);
+            overflow-y: auto;
             .main-page {
                 background-color: $white;
                 height: 100%;
