@@ -113,6 +113,7 @@ export default {
     position: relative;
     .nav-side {
         position: fixed;
+        z-index: 99;
         width: 200px;
         height: 100vh;
         background-color: #001529;
