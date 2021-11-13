@@ -41,5 +41,21 @@ export default {
       url: '/users/delete',
       data: params
     })
+  },
+
+  // 角色列表
+  getRoleList (params) {
+    return request({
+      url: '/roles/allList',
+      data: params
+    })
+  },
+
+  // 部门列表
+  getDeptList (params) {
+    return request({
+      url: '/dept/list',
+      data: params
+    })
   }
 }

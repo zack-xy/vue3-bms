@@ -23,7 +23,7 @@
     </div>
     <div class="base-table">
       <div class="action">
-         <el-button type="primary" @click="handleCreate">新增</el-button>
+         <el-button type="primary" @click="handleCreate(this)">新增</el-button>
          <el-button type="danger" @click="handleBatchDelete">批量删除</el-button>
       </div>
       <el-table :data="userList" @selection-change="handleSelectionChange">
@@ -83,8 +83,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="系统角色" prop="roleList">
-          <el-select class="full-width" v-model="userAddForm.roleList" placeholder="请选择用户角色" clearable filterable>
-
+          <el-select class="full-width" v-model="userAddForm.roleList" placeholder="请选择用户角色" clearable filterable multiple @visible-change="getRoleList">
+            <el-option v-for="item in roleList" :key="item._id" :value="item._id" :label="item.roleName"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门" prop="deptId">
@@ -92,15 +92,16 @@
               style="width:100%"
               v-model="userAddForm.deptId"
               placeholder="请选择所属部门"
-              :options="cascaderOptions"
+              :options="deptList"
               :props="{ checkStrictly: true, value: '_id', label: 'deptName' }"
+              @visible-change="getDeptList"
               clearable/>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+          <el-button type="primary" @click="handleSubmitCreate(this)">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -120,7 +121,6 @@ export default {
     })
     const user = reactive({ userId: '', userName: '', state: 0 })
     const userAddForm = reactive({ userName: '', email: '', mobile: '', job: '', state: 3, roleList: [], deptId: '' })
-    const cascaderOptions = ref([])
     const userAddRoles = reactive({
       userName: [
         {
@@ -151,7 +151,15 @@ export default {
       deptId: [
         {
           required: true,
-          message: '请输入邮箱',
+          message: '请选择部门',
+          trigger: 'blur'
+        }
+      ],
+      roleList: [
+        {
+          type: 'array',
+          required: true,
+          message: '请选择角色',
           trigger: 'blur'
         }
       ]
@@ -164,6 +172,8 @@ export default {
     })
     const checkedUsers = ref([])
     const dialogVisible = ref(false)
+    const roleList = ref([])
+    const deptList = ref([])
     const columns = reactive([
       {
         label: '用户ID',
@@ -252,20 +262,53 @@ export default {
     const handleSelectionChange = (selection) => {
       checkedUsers.value = selection
     }
-    const handleCreate = () => {
+    const handleCreate = (_this) => {
       dialogVisible.value = true
+      _this.$nextTick(() => {
+        _this.$refs.createForm.resetFields()
+      })
+    }
+    const getDeptList = async (status) => {
+      if (!status) return false
+      if (deptList.value.length !== 0) return false
+      const { code, data, msg } = await $api.getDeptList()
+      if (code === 200) {
+        deptList.value = data
+      } else {
+        alertMessage.error(msg)
+      }
+    }
+    const getRoleList = async (status) => {
+      if (!status) return false
+      if (roleList.value.length !== 0) return false
+      const { code, data, msg } = await $api.getRoleList()
+      if (code === 200) {
+        roleList.value = data
+      } else {
+        alertMessage.error(msg)
+      }
+    }
+    const handleSubmitCreate = (_this) => {
+      _this.$refs.createForm.validate((valid) => {
+        if (valid) {
+
+        } else {
+          return false
+        }
+      })
     }
     return {
       USER_STATE,
       user,
       userAddForm,
-      cascaderOptions,
       userAddRoles,
       userList,
       columns,
       pager,
       checkedUsers,
       dialogVisible,
+      roleList,
+      deptList,
       getUserList,
       handleQuery,
       handleReset,
@@ -274,7 +317,10 @@ export default {
       handleDelete,
       handleBatchDelete,
       handleSelectionChange,
-      handleCreate
+      handleCreate,
+      getDeptList,
+      getRoleList,
+      handleSubmitCreate
     }
   }
 }
