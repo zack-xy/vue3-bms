@@ -10,10 +10,9 @@
         </el-form-item>
         <el-form-item prop="state" label="状态">
          <el-select v-model="user.state" placeholder="请选择" clearable>
-           <el-option :value="0" label="所有"></el-option>
-           <el-option :value="1" label="在职"></el-option>
-           <el-option :value="2" label="离职"></el-option>
-           <el-option :value="3" label="试用期"></el-option>
+            <el-option :value="0" label="所有"></el-option>
+            <el-option v-for="key in Object.keys(USER_STATE)" :key="key" :value="key" :label="USER_STATE[key]">
+            </el-option>
          </el-select>
         </el-form-item>
         <el-form-item>
@@ -24,7 +23,7 @@
     </div>
     <div class="base-table">
       <div class="action">
-         <el-button type="primary">新增</el-button>
+         <el-button type="primary" @click="handleCreate">新增</el-button>
          <el-button type="danger" @click="handleBatchDelete">批量删除</el-button>
       </div>
       <el-table :data="userList" @selection-change="handleSelectionChange">
@@ -39,7 +38,7 @@
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
-            <el-button @click="handleClick(scope.row)" size="mini">编辑</el-button>
+            <el-button @click="handleEdit(scope.row)" size="mini">编辑</el-button>
             <el-button @click="handleDelete(scope.row)" type="danger" size="mini">删除</el-button>
           </template>
         </el-table-column>
@@ -47,7 +46,6 @@
       <el-pagination
         class="pagination"
         background
-        :pager-count="6"
         :page-sizes="[10, 30, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper"
         :current-page="pager.pageNum"
@@ -57,6 +55,55 @@
         @current-change="handlePageChanged"
       ></el-pagination>
     </div>
+    <el-dialog
+      v-model="dialogVisible"
+      center
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      title="用户新增"
+      width="40%">
+      <el-form :model="userAddForm" label-width="80px" ref="createForm" :rules="userAddRoles">
+        <el-form-item label="用户名" prop="userName">
+          <el-input v-model="userAddForm.userName" placeholder="请输入用户名" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="userAddForm.email" placeholder="请输入邮箱" clearable>
+            <template #append>@zack.com.cn</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="userAddForm.mobile" placeholder="请输入手机号" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="岗位" prop="job">
+          <el-input v-model="userAddForm.job" placeholder="请输入岗位" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="状态" prop="state">
+          <el-select class="full-width" v-model="userAddForm.state" filterable >
+            <el-option v-for="key in Object.keys(USER_STATE)" :key="key" :value="Number(key)" :label="USER_STATE[key]"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="系统角色" prop="roleList">
+          <el-select class="full-width" v-model="userAddForm.roleList" placeholder="请选择用户角色" clearable filterable>
+
+          </el-select>
+        </el-form-item>
+        <el-form-item label="部门" prop="deptId">
+            <el-cascader
+              style="width:100%"
+              v-model="userAddForm.deptId"
+              placeholder="请选择所属部门"
+              :options="cascaderOptions"
+              :props="{ checkStrictly: true, value: '_id', label: 'deptName' }"
+              clearable/>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -72,6 +119,43 @@ export default {
       getUserList()
     })
     const user = reactive({ userId: '', userName: '', state: 0 })
+    const userAddForm = reactive({ userName: '', email: '', mobile: '', job: '', state: 3, roleList: [], deptId: '' })
+    const cascaderOptions = ref([])
+    const userAddRoles = reactive({
+      userName: [
+        {
+          required: true,
+          message: '请输入用户名',
+          trigger: 'blur'
+        }
+      ],
+      email: [
+        {
+          required: true,
+          message: '请输入邮箱',
+          trigger: 'blur'
+        }
+      ],
+      mobile: [
+        {
+          required: true,
+          message: '请输入手机号',
+          trigger: 'blur'
+        },
+        {
+          pattern: /^1[3456789]\d{9}$/,
+          message: '不正确的手机号格式',
+          trigger: 'blur'
+        }
+      ],
+      deptId: [
+        {
+          required: true,
+          message: '请输入邮箱',
+          trigger: 'blur'
+        }
+      ]
+    })
     const userList = ref([])
     const pager = reactive({
       total: 0,
@@ -79,6 +163,7 @@ export default {
       pageSize: 10
     })
     const checkedUsers = ref([])
+    const dialogVisible = ref(false)
     const columns = reactive([
       {
         label: '用户ID',
@@ -167,12 +252,20 @@ export default {
     const handleSelectionChange = (selection) => {
       checkedUsers.value = selection
     }
+    const handleCreate = () => {
+      dialogVisible.value = true
+    }
     return {
+      USER_STATE,
       user,
+      userAddForm,
+      cascaderOptions,
+      userAddRoles,
       userList,
       columns,
       pager,
       checkedUsers,
+      dialogVisible,
       getUserList,
       handleQuery,
       handleReset,
@@ -180,12 +273,15 @@ export default {
       handlePageChanged,
       handleDelete,
       handleBatchDelete,
-      handleSelectionChange
+      handleSelectionChange,
+      handleCreate
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
+.full-width {
+  width: 100%;
+}
 </style>
