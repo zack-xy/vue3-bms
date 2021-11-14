@@ -48,7 +48,6 @@
 </template>
 <script>
 import BmsIcon from './BmsIcon.vue'
-import { globalLoading } from '@/utils/tools.js'
 import TreeMenu from './TreeMenu.vue'
 import BreadCrumb from './BreadCrumb.vue'
 export default {
@@ -78,24 +77,18 @@ export default {
     },
     async getNoticeCount () {
       try {
-        globalLoading.show()
         const { data } = await this.$api.noticeCount({
           userId: this.userInfo.userId
         })
         this.noticeCount = data
-        globalLoading.close()
       } catch (error) {
-        globalLoading.close()
       }
     },
     async getMenuList () {
       try {
-        globalLoading.show()
         const { data } = await this.$api.getMenuList()
         this.userMenu = data
-        globalLoading.close()
       } catch (error) {
-        globalLoading.close()
       }
     }
   },

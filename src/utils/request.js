@@ -2,6 +2,7 @@ import axios from 'axios'
 import config from '../config'
 import router from '../router'
 import { ElMessage } from 'element-plus'
+import { globalLoading } from '@/utils/tools.js'
 import storage from './storage'
 const TOKEN_INVALID = 'Token认证失败，请重新登陆'
 const NETWORK_ERROR = '网络请求异常，请稍后重试'
@@ -21,6 +22,10 @@ service.interceptors.request.use(req => {
 })
 // 响应拦截
 service.interceptors.response.use(res => {
+  const { config } = res
+  if (!config.isSilence) {
+    globalLoading.close()
+  }
   const { code, msg } = res.data
   if (code === 200) {
     return res.data
@@ -55,6 +60,9 @@ function request (options) {
     service.defaults.baseURL = config.baseApi
   } else {
     service.defaults.baseURL = config.mock ? config.mockApi : config.baseApi
+  }
+  if (!options.isSilence) { // 是否静默请求
+    globalLoading.show()
   }
   return service(options)
 }

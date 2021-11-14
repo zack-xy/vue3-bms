@@ -44,18 +44,20 @@ export default {
   },
 
   // 角色列表
-  getRoleList (params) {
+  getRoleList (params, isSilence = true) {
     return request({
       url: '/roles/allList',
-      data: params
+      data: params,
+      isSilence
     })
   },
 
   // 部门列表
-  getDeptList (params) {
+  getDeptList (params, isSilence = true) {
     return request({
       url: '/dept/list',
-      data: params
+      data: params,
+      isSilence
     })
   },
 

@@ -112,7 +112,7 @@
 import { onMounted, reactive, ref, toRaw } from 'vue'
 import $api from '@/api'
 import { USER_ROLE, USER_STATE } from '@/utils/constant.js'
-import { alertMessage, globalLoading } from '@/utils/tools.js'
+import { alertMessage } from '@/utils/tools.js'
 export default {
   name: 'user',
   setup () {
@@ -225,8 +225,8 @@ export default {
         alertMessage.error(error)
       }
     }
-    const handleQuery = () => {
-      getUserList()
+    const handleQuery = async () => {
+      await getUserList()
     }
     const handleReset = ($refs) => {
       $refs && $refs.form && $refs.form.resetFields()
@@ -241,24 +241,20 @@ export default {
       getUserList()
     }
     const handleDelete = async (row) => {
-      globalLoading.show()
       const { code, msg } = await $api.userDelete({ userIds: [row.userId] })
       alertMessage[code === 200 ? 'success' : 'error'](msg)
       await getUserList()
-      globalLoading.close()
     }
     const handleBatchDelete = async () => {
       if (checkedUsers.value.length === 0) {
         alertMessage.warning('请选择要删除的用户')
         return false
       }
-      globalLoading.show()
       const { code, msg } = await $api.userDelete({
         userIds: checkedUsers.value.map(item => item.userId)
       })
       alertMessage[code === 200 ? 'success' : 'error'](msg)
       await getUserList()
-      globalLoading.close()
     }
     const handleSelectionChange = (selection) => {
       checkedUsers.value = selection
@@ -281,31 +277,27 @@ export default {
         _this.$refs.createForm.resetFields()
         Object.assign(userAddForm, row)
         if (deptList.value.length === 0) {
-          globalLoading.show()
-          await getDeptList(true)
-          globalLoading.close()
+          await getDeptList(true, false)
         }
         if (roleList.value.length === 0) {
-          globalLoading.show()
-          await getRoleList(true)
-          globalLoading.close()
+          await getRoleList(true, false)
         }
       })
     }
-    const getDeptList = async (status) => {
+    const getDeptList = async (status, isSilence = true) => {
       if (!status) return false
       if (deptList.value.length !== 0) return false
-      const { code, data, msg } = await $api.getDeptList()
+      const { code, data, msg } = await $api.getDeptList({}, isSilence)
       if (code === 200) {
         deptList.value = data
       } else {
         alertMessage.error(msg)
       }
     }
-    const getRoleList = async (status) => {
+    const getRoleList = async (status, isSilence = true) => {
       if (!status) return false
       if (roleList.value.length !== 0) return false
-      const { code, data, msg } = await $api.getRoleList()
+      const { code, data, msg } = await $api.getRoleList({}, isSilence)
       if (code === 200) {
         roleList.value = data
       } else {
@@ -317,12 +309,10 @@ export default {
         if (valid) {
           const params = { action: operationType.value, ...toRaw(userAddForm) }
           params.email += '@zack.com.cn'
-          globalLoading.show()
           const { code, msg } = await $api.updateUser(params)
           if (code === 200) {
             alertMessage.success(msg)
             await getUserList()
-            globalLoading.close()
             dialogVisible.value = false
           } else {
             alertMessage.error(msg)
