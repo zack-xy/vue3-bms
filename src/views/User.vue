@@ -38,7 +38,7 @@
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
-            <el-button @click="handleEdit(scope.row)" size="mini">编辑</el-button>
+            <el-button @click="handleEdit(this, scope.row)" size="mini">编辑</el-button>
             <el-button @click="handleDelete(scope.row)" type="danger" size="mini">删除</el-button>
           </template>
         </el-table-column>
@@ -64,10 +64,10 @@
       width="40%">
       <el-form :model="userAddForm" label-width="80px" ref="createForm" :rules="userAddRoles">
         <el-form-item label="用户名" prop="userName">
-          <el-input v-model="userAddForm.userName" placeholder="请输入用户名" clearable></el-input>
+          <el-input v-model="userAddForm.userName" placeholder="请输入用户名" clearable :disabled="operationType === 'edit'" ></el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userAddForm.email" placeholder="请输入邮箱" clearable>
+          <el-input v-model="userAddForm.email" placeholder="请输入邮箱" clearable :disabled="operationType === 'edit'">
             <template #append>@zack.com.cn</template>
           </el-input>
         </el-form-item>
@@ -268,10 +268,29 @@ export default {
       operationType.value = 'add'
       _this.$nextTick(() => {
         _this.$refs.createForm.resetFields()
+        setTimeout(() => {
+          _this.$refs.createForm.clearValidate()
+        }, 0)
       })
     }
-    const handleEdit = (row) => {
-
+    const handleEdit = (_this, row) => {
+      operationType.value = 'edit'
+      dialogVisible.value = true
+      _this.$nextTick(async () => {
+        _this.userAddRoles.roleList = []
+        _this.$refs.createForm.resetFields()
+        Object.assign(userAddForm, row)
+        if (deptList.value.length === 0) {
+          globalLoading.show()
+          await getDeptList(true)
+          globalLoading.close()
+        }
+        if (roleList.value.length === 0) {
+          globalLoading.show()
+          await getRoleList(true)
+          globalLoading.close()
+        }
+      })
     }
     const getDeptList = async (status) => {
       if (!status) return false
