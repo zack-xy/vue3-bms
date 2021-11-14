@@ -57,5 +57,13 @@ export default {
       url: '/dept/list',
       data: params
     })
+  },
+
+  // 用户新增/编辑
+  updateUser (params) {
+    return request({
+      url: '/users/operate',
+      data: params
+    })
   }
 }

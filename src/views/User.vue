@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, toRaw } from 'vue'
 import $api from '@/api'
 import { USER_ROLE, USER_STATE } from '@/utils/constant.js'
 import { alertMessage, globalLoading } from '@/utils/tools.js'
@@ -152,7 +152,7 @@ export default {
         {
           required: true,
           message: '请选择部门',
-          trigger: 'blur'
+          trigger: ['blur', 'change']
         }
       ],
       roleList: [
@@ -160,7 +160,7 @@ export default {
           type: 'array',
           required: true,
           message: '请选择角色',
-          trigger: 'blur'
+          trigger: ['blur', 'change']
         }
       ]
     })
@@ -174,6 +174,7 @@ export default {
     const dialogVisible = ref(false)
     const roleList = ref([])
     const deptList = ref([])
+    const operationType = ref('add')
     const columns = reactive([
       {
         label: '用户ID',
@@ -264,9 +265,13 @@ export default {
     }
     const handleCreate = (_this) => {
       dialogVisible.value = true
+      operationType.value = 'add'
       _this.$nextTick(() => {
         _this.$refs.createForm.resetFields()
       })
+    }
+    const handleEdit = (row) => {
+
     }
     const getDeptList = async (status) => {
       if (!status) return false
@@ -289,9 +294,20 @@ export default {
       }
     }
     const handleSubmitCreate = (_this) => {
-      _this.$refs.createForm.validate((valid) => {
+      _this.$refs.createForm.validate(async (valid) => {
         if (valid) {
-
+          const params = { action: operationType.value, ...toRaw(userAddForm) }
+          params.email += '@zack.com.cn'
+          globalLoading.show()
+          const { code, msg } = await $api.updateUser(params)
+          if (code === 200) {
+            alertMessage.success(msg)
+            await getUserList()
+            globalLoading.close()
+            dialogVisible.value = false
+          } else {
+            alertMessage.error(msg)
+          }
         } else {
           return false
         }
@@ -309,6 +325,7 @@ export default {
       dialogVisible,
       roleList,
       deptList,
+      operationType,
       getUserList,
       handleQuery,
       handleReset,
@@ -318,6 +335,7 @@ export default {
       handleBatchDelete,
       handleSelectionChange,
       handleCreate,
+      handleEdit,
       getDeptList,
       getRoleList,
       handleSubmitCreate
