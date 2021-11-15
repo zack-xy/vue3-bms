@@ -37,7 +37,7 @@ service.interceptors.response.use(res => {
     })
     setTimeout(() => {
       router.push('/login')
-    }, 15000)
+    }, 1500)
     return Promise.reject(TOKEN_INVALID)
   } else {
     ElMessage.error({
