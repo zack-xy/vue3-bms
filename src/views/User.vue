@@ -66,8 +66,8 @@
         <el-form-item label="用户名" prop="userName">
           <el-input v-model="userAddForm.userName" placeholder="请输入用户名" clearable :disabled="operationType === 'edit'" ></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userAddForm.email" placeholder="请输入邮箱" clearable :disabled="operationType === 'edit'">
+        <el-form-item label="邮箱" prop="userEmail">
+          <el-input v-model="userAddForm.userEmail" placeholder="请输入邮箱" clearable :disabled="operationType === 'edit'">
             <template #append>@zack.com.cn</template>
           </el-input>
         </el-form-item>
@@ -112,7 +112,8 @@
 import { onMounted, reactive, ref, toRaw } from 'vue'
 import $api from '@/api'
 import { USER_ROLE, USER_STATE } from '@/utils/constant.js'
-import { alertMessage } from '@/utils/tools.js'
+import { alertMessage, formatDate } from '@/utils/tools.js'
+import moment from 'moment'
 export default {
   name: 'user',
   setup () {
@@ -120,7 +121,7 @@ export default {
       getUserList()
     })
     const user = reactive({ userId: '', userName: '', state: 0 })
-    const userAddForm = reactive({ userName: '', email: '', mobile: '', job: '', state: 3, roleList: [], deptId: '' })
+    const userAddForm = reactive({ userName: '', userEmail: '', mobile: '', job: '', state: 3, roleList: [], deptId: '' })
     const userAddRoles = reactive({
       userName: [
         {
@@ -129,7 +130,7 @@ export default {
           trigger: 'blur'
         }
       ],
-      email: [
+      userEmail: [
         {
           required: true,
           message: '请输入邮箱',
@@ -206,12 +207,18 @@ export default {
       {
         label: '注册时间',
         prop: 'createTime',
-        minWidth: 150
+        minWidth: 150,
+        formatter: (row, column, cellValue, index) => {
+          return moment(cellValue).format('YYYY-MM-DD HH:MM:SS')
+        }
       },
       {
         label: '最后登录时间',
         prop: 'lastLoginTime',
-        minWidth: 150
+        minWidth: 150,
+        formatter: (row, column, cellValue, index) => {
+          return formatDate(new Date(cellValue))
+        }
       }
     ])
     const getUserList = async () => {
