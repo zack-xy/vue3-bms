@@ -53,13 +53,14 @@ function request (options) {
   if (options.method.toLowerCase() === 'get') {
     options.params = options.data
   }
+  let isMock = config.mock
   if (typeof options.mock !== 'undefined') {
-    config.mock = options.mock
+    isMock = options.mock
   }
   if (config.env === 'prod') {
     service.defaults.baseURL = config.baseApi
   } else {
-    service.defaults.baseURL = config.mock ? config.mockApi : config.baseApi
+    service.defaults.baseURL = isMock ? config.mockApi : config.baseApi
   }
   if (!options.isSilence) { // 是否静默请求
     globalLoading.show()
