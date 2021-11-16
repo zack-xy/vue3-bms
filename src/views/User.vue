@@ -283,6 +283,7 @@ export default {
         _this.userAddRoles.roleList = []
         _this.$refs.createForm.resetFields()
         Object.assign(userAddForm, row)
+        userAddForm.userEmail = userAddForm.userEmail.split('@')[0]
         if (deptList.value.length === 0) {
           await getDeptList(true, false)
         }

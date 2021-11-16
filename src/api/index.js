@@ -8,6 +8,7 @@ export default {
     return request({
       url: '/users/login',
       data: params
+      // mock: false
     })
   },
 
@@ -41,6 +42,7 @@ export default {
     return request({
       url: '/users/delete',
       data: params
+      // mock: false
     })
   },
 
@@ -67,6 +69,7 @@ export default {
     return request({
       url: '/users/operate',
       data: params
+      // mock: false
     })
   }
 }
