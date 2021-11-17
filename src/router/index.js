@@ -29,12 +29,20 @@ const routes = [
     component: Home,
     children: [
       {
-        name: 'user',
+        name: '/system/user',
         path: 'user',
         meta: {
           title: '用户管理'
         },
         component: () => import('../views/User.vue')
+      },
+      {
+        name: '/system/menu',
+        path: 'menu',
+        meta: {
+          title: '用户管理'
+        },
+        component: () => import('../views/Menu.vue')
       }
     ]
   },
