@@ -20,7 +20,6 @@
     <div class="base-table">
       <div class="action">
          <el-button type="primary" @click="handleAdd(1)">新增</el-button>
-         <el-button type="danger">批量删除</el-button>
       </div>
       <el-table :data="menuList"
         row-key="_id" border
@@ -164,7 +163,15 @@ export default {
         menuCode: '',
         component: ''
       },
-      menuAddRoles: {},
+      menuAddRoles: {
+        menuName: [
+          {
+            required: true,
+            message: '请输入菜单名',
+            trigger: 'blur'
+          }
+        ]
+      },
       action: 'add'
     }
   },
