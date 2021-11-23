@@ -35,7 +35,7 @@
         </el-table-column>
         <el-table-column label="操作" width="220">
           <template #default="scope">
-            <el-button @click="handleAdd(2, scope.row)" size="mini">新增</el-button>
+            <el-button @click="handleAdd(2, scope.row)" type="primary" size="mini">新增</el-button>
             <el-button @click="handleEdit(scope.row)" size="mini">编辑</el-button>
             <el-button @click="handleDelete(scope.row)" type="danger" size="mini">删除</el-button>
           </template>
@@ -63,7 +63,7 @@
           </el-form-item>
           <el-form-item label="菜单类型" prop="menuType">
             <el-radio-group v-model="menuForm.menuType">
-              <el-radio v-for="key in Object.keys(MENU_TYPE)" :label="key" :key="key">
+              <el-radio v-for="key in Object.keys(MENU_TYPE)" :label="Number(key)" :key="key">
                 {{MENU_TYPE[key]}}
               </el-radio>
             </el-radio-group>
@@ -85,7 +85,7 @@
           </el-form-item>
           <el-form-item label="菜单状态" prop="menuState" v-show="isMenuRadio">
             <el-select v-model="menuForm.menuState" placeholder="请选择" clearable style="width:100%">
-              <el-option v-for="key in Object.keys(MENU_STATE)" :key="key" :value="key" :label="MENU_STATE[key]">
+              <el-option v-for="key in Object.keys(MENU_STATE)" :key="key" :value="Number(key)" :label="MENU_STATE[key]">
               </el-option>
             </el-select>
           </el-form-item>
@@ -162,8 +162,8 @@ export default {
       dialogVisible: false,
       menuForm: {
         parentId: '',
-        menuType: '1',
-        menuState: '1',
+        menuType: 1,
+        menuState: 1,
         menuName: '',
         icon: '',
         path: '',
@@ -190,7 +190,7 @@ export default {
   },
   computed: {
     isMenuRadio () {
-      return this.menuForm.menuType === '1'
+      return this.menuForm.menuType === 1
     }
   },
   methods: {
@@ -212,8 +212,10 @@ export default {
         }
       })
     },
-    handleEdit () {
-
+    handleEdit (row) {
+      this.action = 'edit'
+      this.dialogVisible = true
+      this.menuForm = { ...row }
     },
     handleDelete () {},
     async getMenuList () {
