@@ -71,5 +71,14 @@ export default {
       data: params
       // mock: false
     })
+  },
+
+  // 菜单新增/编辑
+  menuSubmit (params) {
+    return request({
+      url: '/menu/operate',
+      data: params
+      // mock: false
+    })
   }
 }

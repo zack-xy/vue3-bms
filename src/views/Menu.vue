@@ -13,7 +13,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="handleReset()">重置</el-button>
+          <el-button @click="handleReset('form')">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -71,25 +71,31 @@
           <el-form-item label="菜单名称" prop="menuName">
               <el-input v-model="menuForm.menuName" placeholder="请输入菜单名称" clearable ></el-input>
           </el-form-item>
-          <el-form-item label="菜单图标" prop="icon">
+          <el-form-item label="菜单图标" prop="icon" v-show="isMenuRadio">
               <el-input v-model="menuForm.icon" placeholder="请输入菜单图标" clearable ></el-input>
           </el-form-item>
-          <el-form-item label="路由地址" prop="path">
+          <el-form-item label="路由地址" prop="path" v-show="isMenuRadio">
               <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable ></el-input>
           </el-form-item>
           <el-form-item label="权限标识" prop="menuCode">
               <el-input v-model="menuForm.menuCode" placeholder="请输入权限标识" clearable ></el-input>
           </el-form-item>
-          <el-form-item label="组件路径" prop="component">
+          <el-form-item label="组件路径" prop="component" v-show="isMenuRadio">
               <el-input v-model="menuForm.component" placeholder="请输入组件路径" clearable ></el-input>
           </el-form-item>
-          <el-form-item label="菜单状态" prop="menuState">
+          <el-form-item label="菜单状态" prop="menuState" v-show="isMenuRadio">
             <el-select v-model="menuForm.menuState" placeholder="请选择" clearable style="width:100%">
               <el-option v-for="key in Object.keys(MENU_STATE)" :key="key" :value="key" :label="MENU_STATE[key]">
               </el-option>
             </el-select>
           </el-form-item>
         </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="dialogVisible=false">取消</el-button>
+            <el-button type="primary" @click="handleSubmit">确定</el-button>
+          </span>
+        </template>
       </el-dialog>
   </div>
 </template>
@@ -156,7 +162,8 @@ export default {
       dialogVisible: false,
       menuForm: {
         parentId: '',
-        menuState: '',
+        menuType: '1',
+        menuState: '1',
         menuName: '',
         icon: '',
         path: '',
@@ -168,6 +175,12 @@ export default {
           {
             required: true,
             message: '请输入菜单名',
+            trigger: ['blur']
+          },
+          {
+            min: 2,
+            max: 10,
+            message: '长度在2-10个字符',
             trigger: 'blur'
           }
         ]
@@ -175,19 +188,29 @@ export default {
       action: 'add'
     }
   },
+  computed: {
+    isMenuRadio () {
+      return this.menuForm.menuType === '1'
+    }
+  },
   methods: {
     handleQuery () {
-
+      this.getMenuList()
     },
-    handleReset () {
-
+    handleReset (form) {
+      this.$nextTick(() => {
+        this.$refs[form].resetFields()
+      })
     },
     handleAdd (type, row) {
       this.action = 'add'
-      if (type === 2) {
-        this.menuForm.parentId = [...row.parentId, row._id].filter(item => item)
-      }
       this.dialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.createForm.resetFields()
+        if (type === 2) {
+          this.menuForm.parentId = [...row.parentId, row._id].filter(item => item)
+        }
+      })
     },
     handleEdit () {
 
@@ -201,6 +224,26 @@ export default {
         alertMessage.error(error)
         throw new Error(error)
       }
+    },
+    handleSubmit () {
+      this.$refs.createForm.validate(async (valid) => {
+        if (valid) {
+          const params = { ...this.menuForm, action: this.action }
+          const { code, msg } = await this.$api.menuSubmit(params)
+          alertMessage[code === 200 ? 'success' : 'error'](msg)
+          this.dialogVisible = false
+          this.handleReset('createForm')
+        } else {
+          return false
+        }
+      })
+    },
+    handleClose () {
+      this.$nextTick(() => {
+        this.handleReset('createForm')
+      })
+
+      this.dialogVisible = false
     }
   },
   mounted () {
