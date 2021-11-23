@@ -40,6 +40,7 @@ service.interceptors.response.use(res => {
     }, 1500)
     return Promise.reject(TOKEN_INVALID)
   } else {
+    debugger
     ElMessage.error({
       message: msg || NETWORK_ERROR,
       type: 'error',

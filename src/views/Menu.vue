@@ -77,8 +77,8 @@
           <el-form-item label="路由地址" prop="path" v-show="isMenuRadio">
               <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable ></el-input>
           </el-form-item>
-          <el-form-item label="权限标识" prop="menuCode">
-              <el-input v-model="menuForm.menuCode" placeholder="请输入权限标识" clearable ></el-input>
+          <el-form-item label="权限标识" prop="permission">
+              <el-input v-model="menuForm.permission" placeholder="请输入权限标识" clearable ></el-input>
           </el-form-item>
           <el-form-item label="组件路径" prop="component" v-show="isMenuRadio">
               <el-input v-model="menuForm.component" placeholder="请输入组件路径" clearable ></el-input>
@@ -122,7 +122,7 @@ const columns = [
   },
   {
     label: '权限标识',
-    prop: 'menuCode'
+    prop: 'permission'
   },
   {
     label: '路由地址',
@@ -167,7 +167,7 @@ export default {
         menuName: '',
         icon: '',
         path: '',
-        menuCode: '',
+        permission: '',
         component: ''
       },
       menuAddRoles: {
@@ -215,9 +215,15 @@ export default {
     handleEdit (row) {
       this.action = 'edit'
       this.dialogVisible = true
-      this.menuForm = { ...row }
+      this.$nextTick(() => {
+        this.menuForm = { ...row }
+      })
     },
-    handleDelete () {},
+    async handleDelete (row) {
+      const { msg } = await this.$api.menuSubmit({ _id: row._id, action: 'delete' })
+      alertMessage.success(msg)
+      this.getMenuList()
+    },
     async getMenuList () {
       try {
         const { data } = await this.$api.getMenuList(this.queryForm)
@@ -231,8 +237,8 @@ export default {
       this.$refs.createForm.validate(async (valid) => {
         if (valid) {
           const params = { ...this.menuForm, action: this.action }
-          const { code, msg } = await this.$api.menuSubmit(params)
-          alertMessage[code === 200 ? 'success' : 'error'](msg)
+          const { msg } = await this.$api.menuSubmit(params)
+          alertMessage.success(msg)
           this.dialogVisible = false
           this.handleReset('createForm')
         } else {

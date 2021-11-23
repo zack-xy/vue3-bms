@@ -248,8 +248,8 @@ export default {
       getUserList()
     }
     const handleDelete = async (row) => {
-      const { code, msg } = await $api.userDelete({ userIds: [row.userId] })
-      alertMessage[code === 200 ? 'success' : 'error'](msg)
+      const { msg } = await $api.userDelete({ userIds: [row.userId] })
+      alertMessage.success(msg)
       await getUserList()
     }
     const handleBatchDelete = async () => {
@@ -257,10 +257,10 @@ export default {
         alertMessage.warning('请选择要删除的用户')
         return false
       }
-      const { code, msg } = await $api.userDelete({
+      const { msg } = await $api.userDelete({
         userIds: checkedUsers.value.map(item => item.userId)
       })
-      alertMessage[code === 200 ? 'success' : 'error'](msg)
+      alertMessage.success(msg)
       await getUserList()
     }
     const handleSelectionChange = (selection) => {
