@@ -1,15 +1,9 @@
 <template>
-  <div class="menu-manage">
+  <div class="role-manage">
     <div class="query-form">
       <el-form :inline="true" :model="queryForm" ref="form">
-        <el-form-item prop="menuName" label="菜单名称">
-          <el-input v-model="queryForm.menuName" placeholder="请输入菜单名称" clearable></el-input>
-        </el-form-item>
-        <el-form-item prop="menuState" label="菜单状态">
-          <el-select v-model="queryForm.menuState" placeholder="请选择" clearable>
-            <el-option v-for="key in Object.keys(MENU_STATE)" :key="key" :value="key" :label="MENU_STATE[key]">
-            </el-option>
-          </el-select>
+        <el-form-item prop="roleName" label="角色名称">
+          <el-input v-model="queryForm.roleName" placeholder="请输入角色名称" clearable></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
@@ -21,10 +15,7 @@
       <div class="action">
          <el-button type="primary" @click="handleAdd(1)">新增</el-button>
       </div>
-      <el-table :data="menuList"
-        row-key="_id" border
-        tree-props="{children:'children'}"
-        >
+      <el-table :data="roleList" border>
         <el-table-column
           v-for="item in columns"
           :key="item.prop"
@@ -42,7 +33,6 @@
         </el-table-column>
       </el-table>
     </div>
-
       <el-dialog
         v-model="dialogVisible"
         center
@@ -56,7 +46,7 @@
               style="width:100%"
               v-model="menuForm.parentId"
               placeholder="请选择"
-              :options="menuList"
+              :options="roleList"
               :props="{ checkStrictly: true, value: '_id', label: 'menuName' }"
               clearable/>
               <span>不选，则直接创建一级菜单</span>
@@ -99,45 +89,21 @@
       </el-dialog>
   </div>
 </template>
-
 <script>
-import { MENU_STATE, MENU_TYPE } from '@/utils/constant.js'
 import { alertMessage, formatDate } from '@/utils/tools.js'
 const columns = [
   {
-    label: '菜单名称',
-    prop: 'menuName',
+    label: '角色名称',
+    prop: 'roleName',
     minWidth: 180
   },
   {
-    label: '图标',
-    prop: 'icon'
+    label: '备注',
+    prop: 'remark'
   },
   {
-    label: '菜单类型',
-    prop: 'menuType',
-    formatter: (row, column, cellValue, index) => {
-      return MENU_TYPE[cellValue]
-    }
-  },
-  {
-    label: '权限标识',
-    prop: 'permission'
-  },
-  {
-    label: '路由地址',
-    prop: 'path'
-  },
-  {
-    label: '组件路径',
-    prop: 'component'
-  },
-  {
-    label: '菜单状态',
-    prop: 'menuState',
-    formatter: (row, column, cellValue, index) => {
-      return MENU_STATE[cellValue]
-    }
+    label: '权限列表',
+    prop: 'menuType'
   },
   {
     label: '创建时间',
@@ -148,17 +114,14 @@ const columns = [
   }
 ]
 export default {
-  name: 'menu',
+  name: 'role',
   data () {
     return {
-      MENU_STATE: Object.freeze(MENU_STATE),
-      MENU_TYPE: Object.freeze(MENU_TYPE),
       columns: Object.freeze(columns),
       queryForm: {
-        menuState: '',
-        menuName: ''
+        roleName: ''
       },
-      menuList: [],
+      roleList: [],
       dialogVisible: false,
       menuForm: {
         parentId: [null],
@@ -171,7 +134,7 @@ export default {
         component: ''
       },
       menuAddRoles: {
-        menuName: [
+        roleName: [
           {
             required: true,
             message: '请输入菜单名',
@@ -195,7 +158,7 @@ export default {
   },
   methods: {
     handleQuery () {
-      this.getMenuList()
+      this.getRoleList()
     },
     handleReset (form) {
       this.$nextTick(() => {
@@ -222,12 +185,12 @@ export default {
     async handleDelete (row) {
       const { msg } = await this.$api.menuSubmit({ _id: row._id, action: 'delete' })
       alertMessage.success(msg)
-      this.getMenuList()
+      this.getRoleList()
     },
-    async getMenuList () {
+    async getRoleList () {
       try {
-        const { data } = await this.$api.getMenuList(this.queryForm)
-        this.menuList = data
+        const { data } = await this.$api.getRoleList(this.queryForm)
+        this.roleList = data
       } catch (error) {
         alertMessage.error(error)
         throw new Error(error)
@@ -250,16 +213,13 @@ export default {
       this.$nextTick(() => {
         this.handleReset('createForm')
       })
-
       this.dialogVisible = false
     }
   },
   mounted () {
-    this.getMenuList()
+    this.getRoleList()
   }
 }
 </script>
-
 <style lang="scss" scoped>
-
 </style>
