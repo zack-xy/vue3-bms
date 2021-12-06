@@ -26,8 +26,8 @@ const EnvConfig = {
 }
 export default {
   env,
-  mock: env === 'dev',
-  // mock: false, // 联调
+  // mock: env === 'dev',
+  mock: false, // 联调
   namespace: 'vue3Bms',
   ...EnvConfig[env]
 }
