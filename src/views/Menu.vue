@@ -172,6 +172,7 @@
 <script>
 import { MENU_STATE, MENU_TYPE } from '@/utils/constant.js'
 import { alertMessage, formatDate } from '@/utils/tools.js'
+import { ElMessageBox } from 'element-plus'
 const columns = [
   {
     label: '菜单名称',
@@ -291,12 +292,22 @@ export default {
       })
     },
     async handleDelete (row) {
-      const { msg } = await this.$api.menuSubmit({
-        _id: row._id,
-        action: 'delete'
-      })
-      alertMessage.success(msg)
-      this.getMenuList()
+      ElMessageBox.confirm(
+        '确认删除？',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(async () => {
+        const { msg } = await this.$api.menuSubmit({
+          _id: row._id,
+          action: 'delete'
+        })
+        alertMessage.success(msg)
+        this.getMenuList()
+      }).catch(() => {})
     },
     async getMenuList () {
       try {

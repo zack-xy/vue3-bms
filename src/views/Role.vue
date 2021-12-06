@@ -13,7 +13,7 @@
     </div>
     <div class="base-table">
       <div class="action">
-         <el-button type="primary" @click="handleAdd(1)">新增</el-button>
+         <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
       <el-table :data="roleList" border>
         <el-table-column
@@ -24,10 +24,10 @@
           :formatter="item.formatter"
           :min-width="item.minWidth ? item.minWidth: 100">
         </el-table-column>
-        <el-table-column label="操作" width="220">
+        <el-table-column label="操作" width="260">
           <template #default="scope">
-            <el-button @click="handleAdd(2, scope.row)" type="primary" size="mini">新增</el-button>
-            <el-button @click="handleEdit(scope.row)" size="mini">编辑</el-button>
+            <el-button @click="handleEdit(scope.row)" type="primary" size="mini">编辑</el-button>
+            <el-button @click="handleSetPermission(scope.row)" size="mini">设置权限</el-button>
             <el-button @click="handleDelete(scope.row)" type="danger" size="mini">删除</el-button>
           </template>
         </el-table-column>
@@ -49,46 +49,14 @@
         center
         :close-on-click-modal="false"
         :close-on-press-escape="false"
-        title="菜单新增"
+        title="角色新增"
         width="40%">
-        <el-form :model="menuForm" label-width="80px" ref="createForm" :rules="menuAddRoles">
-          <el-form-item label="父级菜单" prop="parentId">
-            <el-cascader
-              style="width:100%"
-              v-model="menuForm.parentId"
-              placeholder="请选择"
-              :options="roleList"
-              :props="{ checkStrictly: true, value: '_id', label: 'menuName' }"
-              clearable/>
-              <span>不选，则直接创建一级菜单</span>
+        <el-form :model="roleForm" label-width="80px" ref="createForm" :rules="roleAddRoles">
+          <el-form-item label="角色名称" prop="roleName">
+              <el-input v-model="roleForm.roleName" placeholder="请输入角色名称" clearable ></el-input>
           </el-form-item>
-          <el-form-item label="菜单类型" prop="menuType">
-            <el-radio-group v-model="menuForm.menuType">
-              <el-radio v-for="key in Object.keys(MENU_TYPE)" :label="Number(key)" :key="key">
-                {{MENU_TYPE[key]}}
-              </el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="菜单名称" prop="menuName">
-              <el-input v-model="menuForm.menuName" placeholder="请输入菜单名称" clearable ></el-input>
-          </el-form-item>
-          <el-form-item label="菜单图标" prop="icon" v-show="isMenuRadio">
-              <el-input v-model="menuForm.icon" placeholder="请输入菜单图标" clearable ></el-input>
-          </el-form-item>
-          <el-form-item label="路由地址" prop="path" v-show="isMenuRadio">
-              <el-input v-model="menuForm.path" placeholder="请输入路由地址" clearable ></el-input>
-          </el-form-item>
-          <el-form-item label="权限标识" prop="permission">
-              <el-input v-model="menuForm.permission" placeholder="请输入权限标识" clearable ></el-input>
-          </el-form-item>
-          <el-form-item label="组件路径" prop="component" v-show="isMenuRadio">
-              <el-input v-model="menuForm.component" placeholder="请输入组件路径" clearable ></el-input>
-          </el-form-item>
-          <el-form-item label="菜单状态" prop="menuState" v-show="isMenuRadio">
-            <el-select v-model="menuForm.menuState" placeholder="请选择" clearable style="width:100%">
-              <el-option v-for="key in Object.keys(MENU_STATE)" :key="key" :value="Number(key)" :label="MENU_STATE[key]">
-              </el-option>
-            </el-select>
+          <el-form-item label="备注" prop="remark">
+              <el-input v-model="roleForm.remark" type="textarea" :rows="5" placeholder="请输入备注" clearable ></el-input>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -102,6 +70,7 @@
 </template>
 <script>
 import { alertMessage, formatDate } from '@/utils/tools.js'
+import { ElMessageBox } from 'element-plus'
 const columns = [
   {
     label: '角色名称',
@@ -139,28 +108,15 @@ export default {
         pageSize: 10
       },
       dialogVisible: false,
-      menuForm: {
-        parentId: [null],
-        menuType: 1,
-        menuState: 1,
-        menuName: '',
-        icon: '',
-        path: '',
-        permission: '',
-        component: ''
+      roleForm: {
+        roleName: ''
       },
-      menuAddRoles: {
+      roleAddRoles: {
         roleName: [
           {
             required: true,
-            message: '请输入菜单名',
+            message: '请输入角色名称',
             trigger: ['blur']
-          },
-          {
-            min: 2,
-            max: 10,
-            message: '长度在2-10个字符',
-            trigger: 'blur'
           }
         ]
       },
@@ -181,27 +137,37 @@ export default {
         this.$refs[form].resetFields()
       })
     },
-    handleAdd (type, row) {
+    handleAdd () {
       this.action = 'add'
       this.dialogVisible = true
       this.$nextTick(() => {
         this.$refs.createForm.resetFields()
-        if (type === 2) {
-          this.menuForm.parentId = [...row.parentId, row._id].filter(item => item)
-        }
       })
     },
     handleEdit (row) {
       this.action = 'edit'
       this.dialogVisible = true
       this.$nextTick(() => {
-        this.menuForm = { ...row }
+        this.roleForm = { ...row }
       })
     },
     async handleDelete (row) {
-      const { msg } = await this.$api.menuSubmit({ _id: row._id, action: 'delete' })
-      alertMessage.success(msg)
-      this.getRoleList()
+      ElMessageBox.confirm(
+        '确认删除？',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(async () => {
+        const { msg } = await this.$api.roleOperate({ _id: row._id, action: 'delete' })
+        alertMessage.success(msg)
+        this.getRoleList()
+      }).catch(() => {})
+    },
+    handleSetPermission (row) {
+
     },
     async getRoleList () {
       try {
@@ -227,11 +193,12 @@ export default {
     handleSubmit () {
       this.$refs.createForm.validate(async (valid) => {
         if (valid) {
-          const params = { ...this.menuForm, action: this.action }
-          const { msg } = await this.$api.menuSubmit(params)
+          const params = { ...this.roleForm, action: this.action }
+          const { msg } = await this.$api.roleOperate(params)
           alertMessage.success(msg)
           this.dialogVisible = false
           this.handleReset('createForm')
+          this.getRoleList()
         } else {
           return false
         }

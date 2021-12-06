@@ -63,6 +63,14 @@ export default {
       mock: true
     })
   },
+  // 角色操作
+  roleOperate (params, isSilence = true) {
+    return request({
+      url: '/roles/operate',
+      data: params,
+      mock: true
+    })
+  },
 
   // 部门列表
   getDeptList (params, isSilence = true) {

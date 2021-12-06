@@ -114,6 +114,7 @@ import $api from '@/api'
 import { USER_ROLE, USER_STATE } from '@/utils/constant.js'
 import { alertMessage, formatDate } from '@/utils/tools.js'
 import moment from 'moment'
+import { ElMessageBox } from 'element-plus'
 export default {
   name: 'user',
   setup () {
@@ -248,9 +249,19 @@ export default {
       getUserList()
     }
     const handleDelete = async (row) => {
-      const { msg } = await $api.userDelete({ userIds: [row.userId] })
-      alertMessage.success(msg)
-      await getUserList()
+      ElMessageBox.confirm(
+        '确认删除？',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(async () => {
+        const { msg } = await $api.userDelete({ userIds: [row.userId] })
+        alertMessage.success(msg)
+        await getUserList()
+      }).catch(() => {})
     }
     const handleBatchDelete = async () => {
       if (checkedUsers.value.length === 0) {
