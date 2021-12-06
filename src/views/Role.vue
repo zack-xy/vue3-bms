@@ -32,6 +32,17 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        class="pagination"
+        background
+        :page-sizes="[10, 30, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :current-page="pager.pageNum"
+        :page-size="pager.pageSize"
+        :total="pager.total"
+        @size-change="handleSizeChanged"
+        @current-change="handlePageChanged"
+      ></el-pagination>
     </div>
       <el-dialog
         v-model="dialogVisible"
@@ -122,6 +133,11 @@ export default {
         roleName: ''
       },
       roleList: [],
+      pager: {
+        total: 0,
+        pageNum: 1,
+        pageSize: 10
+      },
       dialogVisible: false,
       menuForm: {
         parentId: [null],
@@ -189,12 +205,24 @@ export default {
     },
     async getRoleList () {
       try {
-        const { data } = await this.$api.getRoleList(this.queryForm)
-        this.roleList = data
+        const params = { ...this.queryForm, ...this.pager }
+        const { data } = await this.$api.getRoleList(params)
+        const { list, page } = data
+        this.roleList = list
+        this.pager.total = page.total
       } catch (error) {
         alertMessage.error(error)
         throw new Error(error)
       }
+    },
+    handleSizeChanged (size) {
+      this.pager.pageNum = 1
+      this.pager.pageSize = size
+      this.getRoleList()
+    },
+    handlePageChanged (page) {
+      this.pagerpager.pageNum = page
+      this.getRoleList()
     },
     handleSubmit () {
       this.$refs.createForm.validate(async (valid) => {

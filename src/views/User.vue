@@ -83,7 +83,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="系统角色" prop="roleList">
-          <el-select class="full-width" v-model="userAddForm.roleList" placeholder="请选择用户角色" clearable filterable multiple @visible-change="getRoleList">
+          <el-select class="full-width" v-model="userAddForm.roleList" placeholder="请选择用户角色" clearable filterable multiple @visible-change="getAllRoleList">
             <el-option v-for="item in roleList" :key="item._id" :value="item._id" :label="item.roleName"></el-option>
           </el-select>
         </el-form-item>
@@ -288,7 +288,7 @@ export default {
           await getDeptList(true, false)
         }
         if (roleList.value.length === 0) {
-          await getRoleList(true, false)
+          await getAllRoleList(true, false)
         }
       })
     }
@@ -302,10 +302,10 @@ export default {
         alertMessage.error(msg)
       }
     }
-    const getRoleList = async (status, isSilence = true) => {
+    const getAllRoleList = async (status, isSilence = true) => {
       if (!status) return false
       if (roleList.value.length !== 0) return false
-      const { code, data, msg } = await $api.getRoleList({}, isSilence)
+      const { code, data, msg } = await $api.getAllRoleList({}, isSilence)
       if (code === 200) {
         roleList.value = data
       } else {
@@ -354,7 +354,7 @@ export default {
       handleCreate,
       handleEdit,
       getDeptList,
-      getRoleList,
+      getAllRoleList,
       handleSubmitCreate
     }
   }

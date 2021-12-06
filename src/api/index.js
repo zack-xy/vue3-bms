@@ -47,11 +47,20 @@ export default {
   },
 
   // 角色列表
-  getRoleList (params, isSilence = true) {
+  getAllRoleList (params, isSilence = true) {
     return request({
       url: '/roles/allList',
       data: params,
       isSilence
+    })
+  },
+
+  // 角色列表
+  getRoleList (params, isSilence = true) {
+    return request({
+      url: '/roles/list',
+      data: params,
+      mock: true
     })
   },
 
