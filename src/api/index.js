@@ -72,12 +72,20 @@ export default {
     })
   },
 
+  // 更新权限
+  updatePermission (params) {
+    return request({
+      url: '/roles/update/permission',
+      data: params,
+      mock: true
+    })
+  },
+
   // 部门列表
-  getDeptList (params, isSilence = true) {
+  getDeptList (params) {
     return request({
       url: '/dept/list',
-      data: params,
-      isSilence
+      data: params
     })
   },
 
