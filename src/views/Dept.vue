@@ -75,7 +75,7 @@
     </div>
 </template>
 <script>
-import { alertMessage } from '@/utils/tools.js'
+import { alertMessage, formatDate } from '@/utils/tools.js'
 import { ElMessageBox } from 'element-plus'
 export default {
   name: 'dept',
@@ -95,11 +95,17 @@ export default {
         },
         {
           label: '更新时间',
-          prop: 'updateTime'
+          prop: 'updateTime',
+          formatter: (row, column, cellValue, index) => {
+            return formatDate(new Date(cellValue))
+          }
         },
         {
           label: '创建时间',
-          prop: 'createTime'
+          prop: 'createTime',
+          formatter: (row, column, cellValue, index) => {
+            return formatDate(new Date(cellValue))
+          }
         }
       ]),
       deptList: [],
@@ -206,7 +212,7 @@ export default {
     handleSubmit () {
       this.$refs.dialogForm.validate(async (valid) => {
         if (valid) {
-          const params = { ...this.dialogForm, action: this.action }
+          const params = { ...this.deptForm, action: this.action }
           delete params.user
           const { msg } = await this.$api.updateDept(params)
           alertMessage.success(msg)
