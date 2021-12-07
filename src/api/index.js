@@ -59,16 +59,14 @@ export default {
   getRoleList (params, isSilence = true) {
     return request({
       url: '/roles/list',
-      data: params,
-      mock: true
+      data: params
     })
   },
   // 角色操作
   roleOperate (params, isSilence = true) {
     return request({
       url: '/roles/operate',
-      data: params,
-      mock: true
+      data: params
     })
   },
 
@@ -76,8 +74,7 @@ export default {
   updatePermission (params) {
     return request({
       url: '/roles/update/permission',
-      data: params,
-      mock: true
+      data: params
     })
   },
 
