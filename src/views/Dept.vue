@@ -57,7 +57,7 @@
               <el-input placeholder="请输入部门名称" v-model="deptForm.deptName"></el-input>
             </el-form-item>
             <el-form-item label="负责人" prop="user">
-              <el-select class="full-width" placeholder="请选择部门负责人" v-model="deptForm.user" filterable>
+              <el-select class="full-width" placeholder="请选择部门负责人" v-model="deptForm.user" filterable @change="handleUserChanged">
                 <el-option v-for="item in userList" :key="item.userId" :label="item.userName" :value="`${item.userId}/${item.userName}/${item.userEmail}`"></el-option>
               </el-select>
             </el-form-item>
@@ -75,6 +75,8 @@
     </div>
 </template>
 <script>
+import { alertMessage } from '@/utils/tools.js'
+import { ElMessageBox } from 'element-plus'
 export default {
   name: 'dept',
   data () {
@@ -106,13 +108,28 @@ export default {
       deptForm: {
         parentId: [],
         deptName: '',
-        user: ''
+        user: '',
+        userEmail: ''
       },
       deptFormRules: {
         parentId: [
           {
             required: true,
             message: '请选择上级部门',
+            trigger: ['change', 'blur']
+          }
+        ],
+        deptName: [
+          {
+            required: true,
+            message: '请输入部门名称',
+            trigger: ['change', 'blur']
+          }
+        ],
+        user: [
+          {
+            required: true,
+            message: '请选择负责人',
             trigger: ['change', 'blur']
           }
         ]
@@ -146,10 +163,30 @@ export default {
     handleEdit (row) {
       this.action = 'edit'
       this.dialogVisible = true
+      this.$nextTick(() => {
+        Object.assign(this.deptForm, row, {
+          user: `${row.userId}/${row.userName}/${row.userEmail}`
+        })
+      })
     },
     handleDelete (row) {
       this.action = 'delete'
-      this.dialogVisible = true
+      ElMessageBox.confirm(
+        '确认删除？',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(async () => {
+        const { msg } = await this.$api.updateDept({
+          _id: row._id,
+          action: 'delete'
+        })
+        alertMessage.success(msg)
+        this.getMenuList()
+      }).catch(() => {})
     },
     hanldeOpenCreate () {
       this.action = 'add'
@@ -158,7 +195,29 @@ export default {
         this.$refs.dialogForm.resetFields()
       })
     },
-    handleSubmit () {}
+    handleUserChanged (val) {
+      if (val) {
+        const [userId, userName, userEmail] = val.split('/')
+        Object.assign(this.deptForm, { userId, userName, userEmail })
+      } else {
+        this.deptForm.userEmail = ''
+      }
+    },
+    handleSubmit () {
+      this.$refs.dialogForm.validate(async (valid) => {
+        if (valid) {
+          const params = { ...this.dialogForm, action: this.action }
+          delete params.user
+          const { msg } = await this.$api.updateDept(params)
+          alertMessage.success(msg)
+          this.dialogVisible = false
+          this.handleReset('dialogForm')
+          this.getDeptList()
+        } else {
+          return false
+        }
+      })
+    }
   },
   mounted () {
     this.getDeptList()

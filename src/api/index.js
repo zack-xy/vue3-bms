@@ -95,6 +95,14 @@ export default {
     })
   },
 
+  // 部门创建/编辑/删除
+  updateDept (params) {
+    return request({
+      url: '/dept/operate',
+      data: params
+    })
+  },
+
   // 用户新增/编辑
   updateUser (params) {
     return request({
