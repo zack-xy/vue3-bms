@@ -49,7 +49,7 @@
         center
         :close-on-click-modal="false"
         :close-on-press-escape="false"
-        title="角色新增"
+        :title="dialogTitle"
         width="40%">
         <el-form :model="roleForm" label-width="80px" ref="createForm" :rules="roleAddRoles">
           <el-form-item label="角色名称" prop="roleName">
@@ -101,40 +101,39 @@
 <script>
 import { alertMessage, formatDate } from '@/utils/tools.js'
 import { ElMessageBox } from 'element-plus'
-const columns = [
-  {
-    label: '角色名称',
-    prop: 'roleName',
-    minWidth: 180
-  },
-  {
-    label: '备注',
-    prop: 'remark'
-  },
-  {
-    label: '权限列表',
-    prop: 'permissionList'
-  },
-  {
-    label: '更新时间',
-    prop: 'updateTime',
-    formatter: (row, column, cellValue, index) => {
-      return formatDate(new Date(cellValue))
-    }
-  },
-  {
-    label: '创建时间',
-    prop: 'createTime',
-    formatter: (row, column, cellValue, index) => {
-      return formatDate(new Date(cellValue))
-    }
-  }
-]
 export default {
   name: 'role',
   data () {
     return {
-      columns: Object.freeze(columns),
+      columns: Object.freeze([
+        {
+          label: '角色名称',
+          prop: 'roleName',
+          minWidth: 180
+        },
+        {
+          label: '备注',
+          prop: 'remark'
+        },
+        {
+          label: '权限列表',
+          prop: 'permissionList'
+        },
+        {
+          label: '更新时间',
+          prop: 'updateTime',
+          formatter: (row, column, cellValue, index) => {
+            return formatDate(new Date(cellValue))
+          }
+        },
+        {
+          label: '创建时间',
+          prop: 'createTime',
+          formatter: (row, column, cellValue, index) => {
+            return formatDate(new Date(cellValue))
+          }
+        }
+      ]),
       queryForm: {
         roleName: ''
       },
@@ -169,6 +168,9 @@ export default {
   computed: {
     isMenuRadio () {
       return this.menuForm.menuType === 1
+    },
+    dialogTitle () {
+      return this.action === 'add' ? '角色新增' : '角色编辑'
     }
   },
   methods: {

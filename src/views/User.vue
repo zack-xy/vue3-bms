@@ -60,7 +60,7 @@
       center
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      title="用户新增"
+      :title="dialogTitle"
       width="40%">
       <el-form :model="userAddForm" label-width="80px" ref="createForm" :rules="userAddRoles">
         <el-form-item label="用户名" prop="userName">
@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import { onMounted, reactive, ref, toRaw } from 'vue'
+import { onMounted, reactive, ref, toRaw, computed } from 'vue'
 import $api from '@/api'
 import { USER_ROLE, USER_STATE } from '@/utils/constant.js'
 import { alertMessage, formatDate } from '@/utils/tools.js'
@@ -177,6 +177,7 @@ export default {
     const roleList = ref([])
     const deptList = ref([])
     const operationType = ref('add')
+    const dialogTitle = computed(() => operationType.value === 'add' ? '用户新增' : '用户编辑')
     const columns = reactive([
       {
         label: '用户ID',
@@ -351,6 +352,7 @@ export default {
       pager,
       checkedUsers,
       dialogVisible,
+      dialogTitle,
       roleList,
       deptList,
       operationType,

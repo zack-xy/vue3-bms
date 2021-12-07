@@ -37,6 +37,15 @@ export default {
     })
   },
 
+  // 获取全部用户列表
+  getAllUserList (params) {
+    return request({
+      url: '/users/all/list',
+      data: params
+      // mock: false
+    })
+  },
+
   // 用户删除
   userDelete (params) {
     return request({

@@ -76,7 +76,7 @@
       center
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      title="菜单新增"
+      :title="dialogTitle"
       width="40%"
     >
       <el-form
@@ -173,57 +173,56 @@
 import { MENU_STATE, MENU_TYPE } from '@/utils/constant.js'
 import { alertMessage, formatDate } from '@/utils/tools.js'
 import { ElMessageBox } from 'element-plus'
-const columns = [
-  {
-    label: '菜单名称',
-    prop: 'menuName',
-    minWidth: 180
-  },
-  {
-    label: '图标',
-    prop: 'icon'
-  },
-  {
-    label: '菜单类型',
-    prop: 'menuType',
-    formatter: (row, column, cellValue, index) => {
-      return MENU_TYPE[cellValue]
-    }
-  },
-  {
-    label: '权限标识',
-    prop: 'permission'
-  },
-  {
-    label: '路由地址',
-    prop: 'path'
-  },
-  {
-    label: '组件路径',
-    prop: 'component'
-  },
-  {
-    label: '菜单状态',
-    prop: 'menuState',
-    formatter: (row, column, cellValue, index) => {
-      return MENU_STATE[cellValue]
-    }
-  },
-  {
-    label: '创建时间',
-    prop: 'createTime',
-    formatter: (row, column, cellValue, index) => {
-      return formatDate(new Date(cellValue))
-    }
-  }
-]
 export default {
   name: 'menu',
   data () {
     return {
       MENU_STATE: Object.freeze(MENU_STATE),
       MENU_TYPE: Object.freeze(MENU_TYPE),
-      columns: Object.freeze(columns),
+      columns: Object.freeze([
+        {
+          label: '菜单名称',
+          prop: 'menuName',
+          minWidth: 180
+        },
+        {
+          label: '图标',
+          prop: 'icon'
+        },
+        {
+          label: '菜单类型',
+          prop: 'menuType',
+          formatter: (row, column, cellValue, index) => {
+            return MENU_TYPE[cellValue]
+          }
+        },
+        {
+          label: '权限标识',
+          prop: 'permission'
+        },
+        {
+          label: '路由地址',
+          prop: 'path'
+        },
+        {
+          label: '组件路径',
+          prop: 'component'
+        },
+        {
+          label: '菜单状态',
+          prop: 'menuState',
+          formatter: (row, column, cellValue, index) => {
+            return MENU_STATE[cellValue]
+          }
+        },
+        {
+          label: '创建时间',
+          prop: 'createTime',
+          formatter: (row, column, cellValue, index) => {
+            return formatDate(new Date(cellValue))
+          }
+        }
+      ]),
       queryForm: {
         menuState: '',
         menuName: ''
@@ -261,6 +260,9 @@ export default {
   computed: {
     isMenuRadio () {
       return this.menuForm.menuType === 1
+    },
+    dialogTitle () {
+      return this.action === 'add' ? '菜单新增' : '菜单编辑'
     }
   },
   methods: {
