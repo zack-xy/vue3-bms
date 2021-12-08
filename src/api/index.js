@@ -126,5 +126,14 @@ export default {
       url: '/users/getPermissionList',
       data: params
     })
+  },
+
+  // 审批列表-休假申请列表
+  getApproveList (params) {
+    return request({
+      url: '/approve/list',
+      data: params,
+      mock: true
+    })
   }
 }
