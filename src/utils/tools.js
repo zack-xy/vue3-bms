@@ -21,7 +21,6 @@ const globalLoading = {
     }
   }
 }
-
 // 弹窗提示
 // alertMessage.info(msg)
 const alertMessage = {}
@@ -35,7 +34,6 @@ MSG_TYPE.forEach(type => {
     })
   }
 })
-
 // 日期格式化
 const formatDate = (date, rule) => {
   let fmt = rule || 'yyyy-MM-dd hh:mm:ss'
@@ -57,9 +55,34 @@ const formatDate = (date, rule) => {
   }
   return fmt
 }
-
+// 递归menuList权限列表动态生成路由
+const generateRoute = (menuList) => {
+  const routes = []
+  const deepList = list => {
+    while (list.length) {
+      const item = list.pop()
+      if (item.action) {
+        // 根据路由格式，动态生成路由
+        routes.push({
+          name: item.component,
+          path: item.path,
+          meta: {
+            title: item.menuName
+          },
+          component: item.component
+        })
+      }
+      if (item.children && !item.action) {
+        deepList(item.children)
+      }
+    }
+  }
+  deepList(menuList)
+  return routes
+}
 export {
   globalLoading,
   alertMessage,
-  formatDate
+  formatDate,
+  generateRoute
 }

@@ -128,9 +128,9 @@
             clearable
           ></el-input>
         </el-form-item>
-        <el-form-item label="权限标识" prop="permission">
+        <el-form-item label="权限标识" prop="menuCode">
           <el-input
-            v-model="menuForm.permission"
+            v-model="menuForm.menuCode"
             placeholder="请输入权限标识"
             clearable
           ></el-input>
@@ -198,7 +198,7 @@ export default {
         },
         {
           label: '权限标识',
-          prop: 'permission'
+          prop: 'menuCode'
         },
         {
           label: '路由地址',
@@ -236,7 +236,7 @@ export default {
         menuName: '',
         icon: '',
         path: '',
-        permission: '',
+        menuCode: '',
         component: ''
       },
       menuAddRoles: {
