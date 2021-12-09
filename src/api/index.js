@@ -71,6 +71,7 @@ export default {
       data: params
     })
   },
+
   // 角色操作
   roleOperate (params, isSilence = true) {
     return request({
@@ -129,9 +130,18 @@ export default {
   },
 
   // 审批列表-休假申请列表
-  getApproveList (params) {
+  getLeaveList (params) {
     return request({
-      url: '/approve/list',
+      url: '/leave/list',
+      data: params,
+      mock: true
+    })
+  },
+
+  // 申请休假
+  updateLeaveList (params) {
+    return request({
+      url: '/leave/operate',
       data: params,
       mock: true
     })

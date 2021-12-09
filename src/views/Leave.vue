@@ -5,21 +5,21 @@
         <el-form-item prop="state" label="审批状态">
          <el-select v-model="queryForm.applyState" placeholder="请选择" clearable>
             <el-option value="" label="全部"></el-option>
-            <el-option v-for="key in Object.keys(APPLY_STATE)" :key="key" :value="key" :label="APPLY_STATE[key]">
+            <el-option v-for="key in Object.keys(APPLY_STATE)" :key="key" :value="Number(key)" :label="APPLY_STATE[key]">
             </el-option>
          </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="getApplyList">查询</el-button>
+          <el-button type="primary" @click="getLeaveList">查询</el-button>
           <el-button @click="handleReset(this.$refs)">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
     <div class="base-table">
       <div class="action">
-         <el-button type="primary">申请休假</el-button>
+         <el-button type="primary" @click="handleApplyForLeave(this)">申请休假</el-button>
       </div>
-      <el-table :data="applyList">
+      <el-table :data="applyList" border style="width: 100%" max-height="500">
         <el-table-column
           v-for="item in columns"
           :key="item.prop"
@@ -28,10 +28,10 @@
           :formatter="item.formatter"
           :min-width="item.minWidth? item.minWidth: 100">
         </el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" width="180" fixed="right">
           <template #default="scope">
             <el-button @click="handleView(this, scope.row)" size="mini">查看</el-button>
-            <el-button @click="handleQuit(scope.row)" type="danger" size="mini">作废</el-button>
+            <el-button v-if="[1,2].includes(scope.row.applyState)" @click="handleQuit(scope.row)" type="danger" size="mini">作废</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -52,68 +52,96 @@
       center
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      :title="dialogTitle"
-      width="40%">
-      <el-form :model="userAddForm" label-width="80px" ref="createForm" :rules="userAddRoles">
-        <el-form-item label="用户名" prop="userName">
-          <el-input v-model="userAddForm.userName" placeholder="请输入用户名" clearable :disabled="operationType === 'edit'" ></el-input>
+      :title="isView ? '查看':'休假申请'"
+      width="50%">
+      <el-steps :active="viewRow.applyState > 2 ? 3 : viewRow.applyState" align-center v-show="isView" finish-status="success" class="leave-steps">
+        <el-step title="待审批"></el-step>
+        <el-step title="审批中"></el-step>
+        <el-step :title="viewRow.applyState >2 ? APPLY_STATE[viewRow.applyState] : '审批通过/审批拒绝'" :status="stepFinishStatus"></el-step>
+      </el-steps>
+      <el-form :model="applyForm" label-width="80px" ref="createApplyForm" :rules="applyRoles">
+        <el-row>
+            <el-col :span="12">
+              <el-form-item label="休假类型" prop="applyType" required>
+                <el-select class="full-width" v-model="applyForm.applyType" placeholder="请选择" clearable :disabled="isView">
+                  <el-option v-for="key in Object.keys(APPLY_TYPE)" :key="key" :value="Number(key)" :label="APPLY_TYPE[key]">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="休假时间" required prop="leaveDate">
+                <el-date-picker
+                  style="width:100%"
+                  v-model="applyForm.leaveDate"
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  value-format="YYYY-MM-DD"
+                  @change="leaveDateChanged"
+                  end-placeholder="结束日期"
+                  :disabled="isView">
+                </el-date-picker>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="休假时长" prop="leaveTime">
+          {{applyForm.leaveTime}}
         </el-form-item>
-        <el-form-item label="邮箱" prop="userEmail">
-          <el-input v-model="userAddForm.userEmail" placeholder="请输入邮箱" clearable :disabled="operationType === 'edit'">
-            <template #append>@zack.com.cn</template>
+        <el-form-item label="休假原因" prop="reasons">
+          <el-input type="textarea" :row="5" placeholder="请填写休假原因" v-model="applyForm.reasons" :disabled="isView">
           </el-input>
-        </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="userAddForm.mobile" placeholder="请输入手机号" clearable></el-input>
-        </el-form-item>
-        <el-form-item label="岗位" prop="job">
-          <el-input v-model="userAddForm.job" placeholder="请输入岗位" clearable></el-input>
-        </el-form-item>
-        <el-form-item label="状态" prop="state">
-          <el-select class="full-width" v-model="userAddForm.state" filterable >
-            <el-option v-for="key in Object.keys(USER_STATE)" :key="key" :value="Number(key)" :label="USER_STATE[key]"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="系统角色" prop="roleList">
-          <el-select class="full-width" v-model="userAddForm.roleList" placeholder="请选择用户角色" clearable filterable multiple @visible-change="getAllRoleList">
-            <el-option v-for="item in roleList" :key="item._id" :value="item._id" :label="item.roleName"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="部门" prop="deptId">
-            <el-cascader
-              style="width:100%"
-              v-model="userAddForm.deptId"
-              placeholder="请选择所属部门"
-              :options="deptList"
-              :props="{ checkStrictly: true, value: '_id', label: 'deptName' }"
-              @visible-change="getDeptList"
-              clearable/>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmitCreate(this)">确定</el-button>
+          <el-button @click="dialogVisible = false">{{operationType=='create'?'取消':'关闭'}}</el-button>
+          <el-button v-show="operationType=='create'" type="primary" @click="handleSubmitCreate(this)">确定</el-button>
         </span>
       </template>
     </el-dialog>
   </div>
 </template>
-
 <script>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import $api from '@/api'
 import { APPLY_TYPE, APPLY_STATE } from '@/utils/constant.js'
-import { alertMessage, formatDate } from '@/utils/tools.js'
+import { alertMessage, formatDate, toTimestamp } from '@/utils/tools.js'
 import moment from 'moment'
-// import { ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 export default {
   name: 'leave',
   setup () {
     onMounted(() => {
-      getApplyList()
+      getLeaveList()
     })
     const queryForm = reactive({ applyState: '' })
+    const applyForm = reactive({ applyType: '', leaveDate: [], leaveTime: '0天', reasons: '' })
+    const applyRoles = reactive({
+      applyType: [
+        {
+          required: true,
+          message: '请选择休假类型',
+          trigger: ['blur', 'change']
+        }
+      ],
+      leaveDate: [
+        {
+          required: true,
+          message: '请选择休假时间',
+          trigger: ['blur', 'change']
+        }
+      ],
+      reasons: [
+        {
+          required: true,
+          message: '请填写休假原因',
+          trigger: ['blur', 'change']
+        }
+      ]
+    })
     const columns = reactive([
       {
         label: '单号',
@@ -122,6 +150,7 @@ export default {
       {
         label: '休假时间',
         prop: '',
+        minWidth: 200,
         formatter: (row, column, cellValue, index) => {
           return formatDate(new Date(row.startTime), 'yyyy-MM-dd') + '到' + formatDate(new Date(row.endTime), 'yyyy-MM-dd')
         }
@@ -140,7 +169,7 @@ export default {
       },
       {
         label: '休假原因',
-        prop: 'reason'
+        prop: 'reasons'
       },
       {
         label: '申请时间',
@@ -152,7 +181,7 @@ export default {
       },
       {
         label: '审批人',
-        prop: 'auditUser'
+        prop: 'auditUsers'
       },
       {
         label: '当前审批人',
@@ -179,11 +208,26 @@ export default {
       pageSize: 10,
       total: 0
     })
+    const operationType = ref('create')
+    const isView = computed(() => operationType.value === 'view')
+    const viewRow = reactive({})
+    const stepFinishStatus = computed(() => {
+      if (viewRow.applyState === 3) {
+        return 'error'
+      } else if (viewRow.applyState === 4) {
+        return 'success'
+      } else if (viewRow.applyState === 5) {
+        return 'finish'
+      } else {
+        return 'wait'
+      }
+    })
+    const dialogVisible = ref(false)
     const applyList = ref([])
-    const getApplyList = async () => {
+    const getLeaveList = async () => {
       const params = { ...queryForm, ...pager }
       try {
-        const { data } = await $api.getApproveList(params)
+        const { data } = await $api.getLeaveList(params)
         const { list, page } = data
         pager.total = page.total
         applyList.value = list
@@ -194,39 +238,103 @@ export default {
     const handleSizeChanged = (size) => {
       pager.pageNum = 1
       pager.pageSize = size
-      getApplyList()
+      getLeaveList()
     }
     const handlePageChanged = (page) => {
       pager.pageNum = page
-      getApplyList()
+      getLeaveList()
     }
     const handleReset = ($refs) => {
       $refs && $refs.form && $refs.form.resetFields()
     }
-    const handleView = () => {
-
+    const handleView = (_this, row) => {
+      dialogVisible.value = true
+      operationType.value = 'view'
+      Object.assign(viewRow, row)
+      _this.$nextTick(() => {
+        _this.$refs.createApplyForm.resetFields()
+        Object.assign(applyForm, row)
+        applyForm.leaveDate = [row.startTime, row.endTime]
+      })
     }
-    const handleQuit = () => {
-
+    const handleQuit = (row) => {
+      operationType.value = 'delete'
+      ElMessageBox.confirm(
+        '确认作废？',
+        '提示',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).then(async () => {
+        const { msg } = await $api.updateLeaveList({ _id: row._id, action: operationType.value })
+        alertMessage.success(msg)
+        await getLeaveList()
+      }).catch(() => {})
+    }
+    const leaveDateChanged = (val) => {
+      if (Array.isArray(val) && val.length > 1) {
+        const days = (toTimestamp(val[1]) - toTimestamp(val[0])) / 1000 / 3600 / 24
+        applyForm.leaveTime = `${days + 1}天`
+      } else {
+        applyForm.leaveTime = '0天'
+      }
+    }
+    const handleSubmitCreate = (_this) => {
+      _this.$refs.createApplyForm.validate(async (valid) => {
+        if (valid) {
+          const params = { ...applyForm, action: operationType.value }
+          const { msg } = await $api.updateLeaveList(params)
+          dialogVisible.value = false
+          alertMessage.success(msg)
+          await getLeaveList()
+        } else {
+          return false
+        }
+      })
+    }
+    const handleApplyForLeave = (_this) => {
+      dialogVisible.value = true
+      operationType.value = 'create'
+      _this.$nextTick(() => {
+        _this.$refs.createApplyForm.resetFields()
+        setTimeout(() => {
+          _this.$refs.createApplyForm.clearValidate()
+        }, 0)
+      })
     }
     return {
       APPLY_STATE,
+      APPLY_TYPE,
       queryForm,
       applyList,
       pager,
       columns,
+      isView,
+      viewRow,
+      stepFinishStatus,
+      operationType,
+      dialogVisible,
+      applyForm,
+      applyRoles,
       handleSizeChanged,
       handlePageChanged,
       handleReset,
       handleView,
-      handleQuit
+      handleQuit,
+      handleApplyForLeave,
+      handleSubmitCreate,
+      leaveDateChanged
     }
   }
 }
 </script>
-
 <style lang="scss" scoped>
 .full-width {
   width: 100%;
+}
+.leave-steps {
+  margin-bottom: 20px;
 }
 </style>
