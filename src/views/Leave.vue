@@ -10,7 +10,7 @@
          </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="getLeaveList">查询</el-button>
+          <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset(this.$refs)">重置</el-button>
         </el-form-item>
       </el-form>
@@ -28,7 +28,7 @@
           :formatter="item.formatter"
           :min-width="item.minWidth? item.minWidth: 100">
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="180">
           <template #default="scope">
             <el-button @click="handleView(this, scope.row)" size="mini">查看</el-button>
             <el-button v-if="[1,2].includes(scope.row.applyState)" @click="handleQuit(scope.row)" type="danger" size="mini">作废</el-button>
@@ -105,7 +105,7 @@
   </div>
 </template>
 <script>
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, reactive, ref, computed, nextTick } from 'vue'
 import $api from '@/api'
 import { APPLY_TYPE, APPLY_STATE } from '@/utils/constant.js'
 import { alertMessage, formatDate, toTimestamp } from '@/utils/tools.js'
@@ -193,15 +193,15 @@ export default {
         formatter: (row, column, cellValue, index) => {
           return APPLY_STATE[cellValue]
         }
-      },
-      {
-        label: '最后登录时间',
-        prop: 'lastLoginTime',
-        minWidth: 150,
-        formatter: (row, column, cellValue, index) => {
-          return formatDate(new Date(cellValue))
-        }
       }
+      // {
+      //   label: '最后登录时间',
+      //   prop: 'lastLoginTime',
+      //   minWidth: 150,
+      //   formatter: (row, column, cellValue, index) => {
+      //     return formatDate(new Date(cellValue))
+      //   }
+      // }
     ])
     const pager = reactive({
       pageNum: 1,
@@ -231,6 +231,7 @@ export default {
         const { list, page } = data
         pager.total = page.total
         applyList.value = list
+        await nextTick()
       } catch (error) {
         alertMessage.error(error)
       }
@@ -242,6 +243,9 @@ export default {
     }
     const handlePageChanged = (page) => {
       pager.pageNum = page
+      getLeaveList()
+    }
+    const handleSearch = () => {
       getLeaveList()
     }
     const handleReset = ($refs) => {
@@ -318,6 +322,7 @@ export default {
       dialogVisible,
       applyForm,
       applyRoles,
+      handleSearch,
       handleSizeChanged,
       handlePageChanged,
       handleReset,

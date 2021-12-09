@@ -133,8 +133,7 @@ export default {
   getLeaveList (params) {
     return request({
       url: '/leave/list',
-      data: params,
-      mock: true
+      data: params
     })
   },
 
@@ -142,8 +141,7 @@ export default {
   updateLeaveList (params) {
     return request({
       url: '/leave/operate',
-      data: params,
-      mock: true
+      data: params
     })
   }
 }
