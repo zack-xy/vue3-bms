@@ -143,5 +143,13 @@ export default {
       url: '/leave/operate',
       data: params
     })
+  },
+
+  // 审批
+  leaveApprove (params) {
+    return request({
+      url: '/leave/approve',
+      data: params
+    })
   }
 }
