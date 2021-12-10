@@ -14,5 +14,9 @@ export default {
   saveUserAction (state, actionList) {
     state.actionList = actionList
     storage.setItem('userAction', actionList)
+  },
+  saveNoticeCount (state, noticeCount) {
+    state.noticeCount = noticeCount
+    storage.setItem('noticeCount', noticeCount)
   }
 }

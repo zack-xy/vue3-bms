@@ -230,6 +230,7 @@ export default {
           dialogVisible.value = false
           alertMessage.success(msg)
           await getLeaveList()
+          store.commit('saveNoticeCount', store.state.noticeCount - 1)
         } else {
           return false
         }

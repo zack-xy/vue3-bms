@@ -15,7 +15,7 @@ export default {
   // 获取消息数目
   noticeCount (params) {
     return request({
-      url: '/approve/count',
+      url: '/leave/count',
       data: params
     })
   },

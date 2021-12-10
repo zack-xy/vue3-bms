@@ -7,7 +7,8 @@ import storage from '@/utils/storage'
 const state = {
   userInfo: storage.getItem('userInfo') || {},
   menuList: storage.getItem('userMenu') || [],
-  actionList: storage.getItem('userAction') || []
+  actionList: storage.getItem('userAction') || [],
+  noticeCount: storage.getItem('noticeCount') || 0
 }
 export default createStore({
   state,

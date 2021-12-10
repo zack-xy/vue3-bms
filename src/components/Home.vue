@@ -23,7 +23,7 @@
                     </div>
                 </div>
                 <div class="user-info">
-                    <el-badge :value="noticeCount>0 ? noticeCount: undefined" :max="99" class="notice" type="danger">
+                    <el-badge :value="noticeCount>0 ? noticeCount: undefined" :max="99" class="notice" type="danger" @click="$router.push('/audit/approve')">
                         <BmsIcon class="bell-icon" name="bell" />
                     </el-badge>
                     <el-dropdown @command="handleLogout">
@@ -55,7 +55,6 @@ export default {
     return {
       isCollapse: false,
       userInfo: this.$store.state.userInfo || {},
-      noticeCount: 0,
       userMenu: [],
       activeMenu: location.hash.slice(1)
     }
@@ -64,6 +63,11 @@ export default {
     TreeMenu,
     BreadCrumb,
     BmsIcon
+  },
+  computed: {
+    noticeCount () {
+      return this.$store.state.noticeCount
+    }
   },
   methods: {
     toggle () {
@@ -80,7 +84,7 @@ export default {
         const { data } = await this.$api.noticeCount({
           userId: this.userInfo.userId
         })
-        this.noticeCount = data
+        this.$store.commit('saveNoticeCount', data)
       } catch (error) {
       }
     },
