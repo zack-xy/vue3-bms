@@ -7,7 +7,9 @@
 vue3练手后台管理项目   
 用户管理、角色人员管理等少数几个页面  
 大部分采用vue选项式API   
-有部分页面使用vue3组合式API`setup()`
+有部分页面使用vue3组合式API`setup()`  
+
+配合mock服务，具体查看[这个项目](https://github.com/zack-xy/o-bricks/tree/main/mockServer)
 
 
 
